@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="WealthyFlow 2.0 — Elite Mindset, Mastery & Crypto Courses for wealth builders." />
+  <title>WealthyFlow 2.0 — Build Wealth. Master Crypto. Elevate Your Mindset.</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23c9a84c'/><text x='16' y='23' text-anchor='middle' font-size='20' font-weight='900' fill='%230a0a0a'>W</text></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ── NAVBAR ──────────────────────────────────────────────── -->
+<nav id="navbar" role="navigation" aria-label="Main navigation">
+  <a href="#hero" class="nav-logo" aria-label="WealthyFlow Home">
+    <div class="nav-logo-icon">W</div>
+    <span class="nav-logo-text">Wealthy<span>Flow</span> 2.0</span>
+  </a>
+
+  <ul class="nav-links" role="list">
+    <li><a href="#hero" class="active">Home</a></li>
+    <li><a href="#courses">Courses</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#cta">Pricing</a></li>
+  </ul>
+
+  <div class="nav-actions">
+    <a href="/admin" class="btn btn-outline btn-sm" aria-label="Admin Dashboard">Admin</a>
+    <a href="#courses" class="btn btn-gold btn-sm" aria-label="Start Learning">Start Learning</a>
+  </div>
+
+  <button id="hamburger" aria-label="Toggle mobile menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile nav -->
+<nav id="mobile-nav" aria-label="Mobile navigation">
+  <a href="#hero">🏠 Home</a>
+  <a href="#courses">📚 Courses</a>
+  <a href="#features">⚡ Features</a>
+  <a href="#testimonials">⭐ Reviews</a>
+  <a href="#cta">💰 Pricing</a>
+  <a href="/admin">🛠 Admin</a>
+  <a href="#courses" class="btn btn-gold btn-sm" style="margin-top:8px">Start Learning</a>
+</nav>
+
+<!-- ── HERO ────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Now Live — 15 Premium Courses
+      </div>
+
+      <h1 class="hero-title">
+        <span class="line1">Build Wealth.</span>
+        <span class="line2">Elevate Your Mind.</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        The world's most elite platform for Mindset mastery, Wealth-building skills, and Crypto domination. 
+        Join 12,000+ high-performers transforming their financial reality.
+      </p>
+
+      <div class="hero-actions">
+        <button class="btn btn-gold btn-lg" data-scroll-to="courses" aria-label="Browse all courses">
+          🚀 Browse Courses
+        </button>
+        <button class="btn btn-ghost btn-lg" data-goto-tab="crypto" aria-label="View crypto courses">
+          ₿ Crypto Courses
+        </button>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-number" data-counter="12847" data-suffix="">12,847</span>
+          <span class="stat-label">Active Students</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number" data-counter="15" data-suffix="">15</span>
+          <span class="stat-label">Elite Courses</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number" data-counter="98" data-suffix="%">98%</span>
+          <span class="stat-label">Satisfaction Rate</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number" data-counter="4" data-suffix=".9★">4.9★</span>
+          <span class="stat-label">Average Rating</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── COURSES ─────────────────────────────────────────────── -->
+<section id="courses" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">📚 Our Curriculum</div>
+      <h2 class="section-title">Three Pillars of <span class="gold">Elite Wealth</span></h2>
+      <p class="section-subtitle">
+        Whether you're building the right mindset, mastering wealth strategies, or dominating crypto — 
+        our courses give you the edge that separates the wealthy from everyone else.
+      </p>
+    </div>
+
+    <!-- Course Tab Buttons -->
+    <div class="courses-tabs" role="tablist" aria-label="Course categories">
+      <button class="tab-btn" data-tab="mindset" role="tab" aria-selected="true" aria-controls="panel-mindset">
+        <span class="tab-icon">🧠</span> Mindset
+      </button>
+      <button class="tab-btn" data-tab="mastery" role="tab" aria-selected="false" aria-controls="panel-mastery">
+        <span class="tab-icon">⚡</span> Mastery
+      </button>
+      <button class="tab-btn" data-tab="crypto" role="tab" aria-selected="false" aria-controls="panel-crypto">
+        <span class="tab-icon">₿</span> WealthFlow Crypto
+      </button>
+    </div>
+
+    <!-- Mindset Panel -->
+    <div class="course-panel" id="panel-mindset" role="tabpanel">
+      <div class="course-grid" id="grid-mindset"></div>
+    </div>
+
+    <!-- Mastery Panel -->
+    <div class="course-panel" id="panel-mastery" role="tabpanel">
+      <div class="course-grid" id="grid-mastery"></div>
+    </div>
+
+    <!-- Crypto Panel -->
+    <div class="course-panel" id="panel-crypto" role="tabpanel">
+      <div class="course-grid" id="grid-crypto"></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── FEATURES ────────────────────────────────────────────── -->
+<section id="features" class="section section-alt">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">⚡ Why WealthyFlow</div>
+      <h2 class="section-title">Built for <span class="gold">High Performers</span></h2>
+      <p class="section-subtitle">
+        Every feature of WealthyFlow 2.0 is engineered to accelerate your transformation 
+        from where you are now to where you know you should be.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon">🎯</div>
+        <h3 class="feature-title">Expert-Curated Content</h3>
+        <p class="feature-desc">Every course is crafted by millionaires, traders, and wealth builders who have actually done it — not theoretical academics.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon">⚡</div>
+        <h3 class="feature-title">Immediate Access</h3>
+        <p class="feature-desc">Enroll and start watching instantly. No delays, no waiting. Your transformation begins the moment you commit.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="feature-icon">🔴</div>
+        <h3 class="feature-title">Live Market Data</h3>
+        <p class="feature-desc">Our crypto modules integrate real-time market insights so you can apply what you learn while markets are moving.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-4">
+        <div class="feature-icon">👥</div>
+        <h3 class="feature-title">Elite Community</h3>
+        <p class="feature-desc">Join a private network of 12,000+ wealth builders. Mastermind, network, and grow alongside people who match your ambition.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon">📱</div>
+        <h3 class="feature-title">Learn Anywhere</h3>
+        <p class="feature-desc">Fully responsive on every device. Your education travels with you — on the plane, in the gym, anywhere life takes you.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon">🏆</div>
+        <h3 class="feature-title">Verified Certificates</h3>
+        <p class="feature-desc">Complete courses and earn blockchain-verified certificates of achievement that signal your elite status to the world.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="feature-icon">🔄</div>
+        <h3 class="feature-title">Lifetime Updates</h3>
+        <p class="feature-desc">Markets evolve, strategies update, and so does your content. Pay once — access everything forever including all future updates.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-4">
+        <div class="feature-icon">💎</div>
+        <h3 class="feature-title">1-on-1 Mentorship</h3>
+        <p class="feature-desc">Elite plan members receive direct access to weekly group coaching calls and priority support from our expert team.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── TESTIMONIALS ─────────────────────────────────────────── -->
+<section id="testimonials" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">⭐ Success Stories</div>
+      <h2 class="section-title">Real Results from <span class="gold">Real Students</span></h2>
+      <p class="section-subtitle">
+        These are the stories of people who decided to invest in themselves — and changed their financial trajectory forever.
+      </p>
+    </div>
+
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal reveal-delay-1">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"The Crypto Trading Mastery course completely transformed how I approach the market. I went from losing money to generating consistent 3-5% weekly returns. This course paid for itself in the first week."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">M</div>
+          <div>
+            <div class="testimonial-name">Marcus Williams</div>
+            <div class="testimonial-role">Crypto Trader, Chicago</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal reveal-delay-2">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"I was stuck in a scarcity mindset for years. After completing the Millionaire Mindset Blueprint, I closed my first $50k real estate deal within 60 days. The psychology section alone is worth 10x the price."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">A</div>
+          <div>
+            <div class="testimonial-name">Aria Thompson</div>
+            <div class="testimonial-role">Real Estate Investor, Atlanta</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal reveal-delay-3">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"The DeFi Yield Maximizer opened my eyes to passive income streams I never knew existed. I'm now earning 15-20% APY on assets I was just holding. WealthyFlow is the real deal."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">D</div>
+          <div>
+            <div class="testimonial-name">Devon Clarke</div>
+            <div class="testimonial-role">DeFi Investor, Miami</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal reveal-delay-1">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"Built my digital agency to $45k/month revenue using the exact frameworks from the Agency Building Blueprint. The ROI on this course is absolutely insane. Best investment I've ever made."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">Z</div>
+          <div>
+            <div class="testimonial-name">Zara Patel</div>
+            <div class="testimonial-role">Agency Owner, New York</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal reveal-delay-2">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"The Stock Market Mastery Pro course helped me understand options trading for the first time. I've grown my portfolio by 127% since completing the course 8 months ago. Absolutely phenomenal."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">E</div>
+          <div>
+            <div class="testimonial-name">Elijah Monroe</div>
+            <div class="testimonial-role">Options Trader, Dallas</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal reveal-delay-3">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"WealthyFlow isn't just a course platform — it's a complete ecosystem for wealth creation. The community alone is worth the price. I've made business connections that have been worth hundreds of thousands."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">S</div>
+          <div>
+            <div class="testimonial-name">Sofia Rodriguez</div>
+            <div class="testimonial-role">Entrepreneur, Los Angeles</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:48px" class="reveal">
+      <div class="enrollment-badge">🎓 Join 12,847+ students already enrolled — spots are limited</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── CTA ──────────────────────────────────────────────────── -->
+<section id="cta">
+  <div class="container">
+    <div class="section-tag reveal" style="margin:0 auto 16px">🔥 Limited Time Offer</div>
+    <h2 class="cta-title reveal">Start Your Wealth Journey <span class="gold">Today</span></h2>
+    <p class="cta-sub reveal">
+      Get access to all 15 courses, live crypto market data, the elite community, and lifetime updates.<br>
+      Your future self will thank you.
+    </p>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap" class="reveal">
+      <button class="btn btn-gold btn-lg" data-scroll-to="courses">
+        🚀 Enroll in a Course
+      </button>
+      <button class="btn btn-ghost btn-lg" data-goto-tab="mindset">
+        🧠 Start with Mindset
+      </button>
+      <button class="btn btn-purple btn-lg" data-goto-tab="crypto">
+        ₿ Explore Crypto
+      </button>
+    </div>
+    <p style="margin-top:24px;font-size:0.8rem;color:var(--text-muted)" class="reveal">
+      🔒 Secure checkout · 30-day money-back guarantee · Instant access
+    </p>
+  </div>
+</section>
+
+<!-- ── FOOTER ────────────────────────────────────────────────── -->
+<footer id="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="footer-logo-icon">W</div>
+          <span class="footer-logo-text">Wealthy<span>Flow</span> 2.0</span>
+        </div>
+        <p class="footer-desc">
+          The world's most elite platform for Mindset mastery, Wealth-building skills, 
+          and Crypto domination. Build generational wealth — starting today.
+        </p>
+        <div class="footer-social">
+          <a class="social-btn" href="#" aria-label="Twitter/X">𝕏</a>
+          <a class="social-btn" href="#" aria-label="Instagram">📸</a>
+          <a class="social-btn" href="#" aria-label="YouTube">▶</a>
+          <a class="social-btn" href="#" aria-label="Telegram">✈</a>
+          <a class="social-btn" href="#" aria-label="Discord">💬</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Courses</h4>
+        <ul class="footer-links">
+          <li><a href="#courses" data-goto-tab="mindset">Mindset Courses</a></li>
+          <li><a href="#courses" data-goto-tab="mastery">Mastery Courses</a></li>
+          <li><a href="#courses" data-goto-tab="crypto">Crypto Courses</a></li>
+          <li><a href="#courses">All Courses</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul class="footer-links">
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Success Stories</a></li>
+          <li><a href="#">Affiliates</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul class="footer-links">
+          <li><a href="#">Help Center</a></li>
+          <li><a href="#">Community</a></li>
+          <li><a href="#">Refund Policy</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p class="footer-bottom-text">© 2024 WealthyFlow 2.0. All rights reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ── COURSE MODAL ──────────────────────────────────────────── -->
+<div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-course-title">
+  <div class="modal" id="course-modal">
+    <div class="modal-header">
+      <div>
+        <div class="course-card-category modal-category"></div>
+        <h3 class="modal-title-text" id="modal-course-title"></h3>
+      </div>
+      <button class="modal-close" id="modal-close" aria-label="Close modal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-thumb"></div>
+      <div class="course-card-meta modal-meta" style="margin-bottom:16px"></div>
+      <p class="modal-desc"></p>
+
+      <h4 style="font-size:0.85rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">
+        📋 What You'll Learn
+      </h4>
+      <ul class="curriculum-list"></ul>
+
+      <div class="modal-price-row">
+        <div>
+          <div class="modal-price-main"></div>
+          <div class="modal-price-sub">One-time payment · Lifetime access</div>
+        </div>
+        <button class="btn btn-gold modal-enroll-btn">Enroll Now →</button>
+      </div>
+
+      <p style="font-size:0.75rem;color:var(--text-muted);text-align:center;margin-top:8px">
+        🔒 Secure payment · 30-day money-back guarantee
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ─────────────────────────────────────────────────── -->
+<div id="toast-container" aria-live="polite" aria-label="Notifications"></div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
