@@ -9,6 +9,14 @@ interface WalletContextType {
   disconnect: () => void
 }
 
+interface EthereumProvider {
+  request: (args: { method: string }) => Promise<unknown>
+  on: (event: string, handler: (data: unknown) => void) => void
+  removeListener: (event: string, handler: (data: unknown) => void) => void
+}
+
+type WindowWithEthereum = Window & { ethereum?: EthereumProvider }
+
 export const WalletContext = createContext<WalletContextType | null>(null)
 
 export function WalletProvider({ children }: { children: ReactNode }) {
@@ -31,7 +39,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    const eth = (window as Window & { ethereum?: { request: (args: { method: string }) => Promise<unknown>; on: (event: string, handler: (data: unknown) => void) => void; removeListener: (event: string, handler: (data: unknown) => void) => void } }).ethereum
+    const eth = (window as WindowWithEthereum).ethereum
     if (!eth) return
 
     // Restore session if already connected
@@ -55,7 +63,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, [handleAccountsChanged, handleChainChanged])
 
   const connect = useCallback(async () => {
-    const eth = (window as Window & { ethereum?: { request: (args: { method: string }) => Promise<unknown> } }).ethereum
+    const eth = (window as WindowWithEthereum).ethereum
     if (!eth) {
       setError('No wallet detected. Please install MetaMask.')
       return
@@ -87,4 +95,3 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     </WalletContext.Provider>
   )
 }
-
