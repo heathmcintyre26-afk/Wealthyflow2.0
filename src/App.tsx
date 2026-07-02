@@ -7,9 +7,11 @@ import Pricing from './pages/Pricing'
 import Courses from './pages/Courses'
 import CourseDetail from './pages/CourseDetail'
 import Admin from './pages/Admin'
+import { WalletProvider } from './context/WalletContext'
 
 function App() {
   return (
+    <WalletProvider>
     <Router>
       <div className="min-h-screen bg-crypto-dark flex flex-col">
         <Navbar />
@@ -26,6 +28,7 @@ function App() {
         <Footer />
       </div>
     </Router>
+    </WalletProvider>
   )
 }
 

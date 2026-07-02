@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { TrendingUp, TrendingDown, DollarSign, Target } from 'lucide-react'
+import { TrendingUp, TrendingDown, DollarSign, Target, Wallet } from 'lucide-react'
+import { useWallet } from '../hooks/useWallet'
 
 interface CryptoData {
   id: string
@@ -11,9 +12,10 @@ interface CryptoData {
 }
 
 export default function Dashboard() {
+  const { account, connect, isConnecting } = useWallet()
   const [cryptos, setCryptos] = useState<CryptoData[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [error] = useState<string | null>(null)
 
   // Sample data - replace with real API calls
   useEffect(() => {
@@ -36,6 +38,25 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-crypto-dark">
+      {!account && (
+        <div className="flex flex-col items-center justify-center min-h-screen space-y-6 px-4 text-center">
+          <div className="gradient-crypto p-5 rounded-2xl">
+            <Wallet className="w-12 h-12" />
+          </div>
+          <h2 className="text-3xl font-bold">Connect Your Wallet</h2>
+          <p className="text-gray-400 max-w-md">
+            Connect your wallet to view your portfolio, track your holdings, and start trading.
+          </p>
+          <button
+            onClick={connect}
+            disabled={isConnecting}
+            className="btn-primary text-base disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isConnecting ? 'Connecting…' : 'Connect Wallet'}
+          </button>
+        </div>
+      )}
+      {account && (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Page Title */}
         <div className="mb-12">
@@ -170,6 +191,7 @@ export default function Dashboard() {
           </p>
         </div>
       </div>
+      )}
     </div>
   )
 }
