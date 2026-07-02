@@ -15,7 +15,6 @@ export default function Dashboard() {
   const { account, connect, isConnecting } = useWallet()
   const [cryptos, setCryptos] = useState<CryptoData[]>([])
   const [loading, setLoading] = useState(true)
-  const [error] = useState<string | null>(null)
 
   // Sample data - replace with real API calls
   useEffect(() => {
@@ -129,10 +128,6 @@ export default function Dashboard() {
             <div className="p-12 text-center">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-crypto-accent"></div>
               <p className="mt-4 text-gray-400">Loading market data...</p>
-            </div>
-          ) : error ? (
-            <div className="p-12 text-center text-crypto-danger">
-              <p>Error loading data: {error}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
