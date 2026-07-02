@@ -1,9 +1,15 @@
 import { useState } from 'react'
 import { Menu, X, Wallet } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useWallet } from '../hooks/useWallet'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const { account, isConnecting, error, connect, disconnect } = useWallet()
+
+  const shortAddress = account
+    ? `${account.slice(0, 6)}...${account.slice(-4)}`
+    : null
 
   return (
     <nav className="bg-crypto-light border-b border-white/10 sticky top-0 z-50">
@@ -23,9 +29,24 @@ export default function Navbar() {
             <Link to="/dashboard" className="text-gray-300 hover:text-white transition">Dashboard</Link>
             <Link to="/courses" className="text-gray-300 hover:text-white transition">Courses</Link>
             <Link to="/pricing" className="text-gray-300 hover:text-white transition">Pricing</Link>
-            <button className="btn-primary text-sm">
-              Connect Wallet
-            </button>
+            {account ? (
+              <button
+                onClick={disconnect}
+                className="btn-primary text-sm flex items-center space-x-2"
+                title="Click to disconnect"
+              >
+                <span className="w-2 h-2 rounded-full bg-crypto-success inline-block"></span>
+                <span>{shortAddress}</span>
+              </button>
+            ) : (
+              <button
+                onClick={connect}
+                disabled={isConnecting}
+                className="btn-primary text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isConnecting ? 'Connecting…' : 'Connect Wallet'}
+              </button>
+            )}
             <Link to="/admin" className="text-gray-300 hover:text-crypto-accent transition text-sm">
               Admin
             </Link>
@@ -40,6 +61,13 @@ export default function Navbar() {
           </button>
         </div>
 
+        {/* Error banner */}
+        {error && (
+          <div className="pb-2">
+            <p className="text-crypto-danger text-sm text-center">{error}</p>
+          </div>
+        )}
+
         {/* Mobile Menu */}
         {isOpen && (
           <div className="md:hidden pb-4 border-t border-white/10">
@@ -48,9 +76,23 @@ export default function Navbar() {
             <Link to="/courses" className="block py-2 text-gray-300 hover:text-white">Courses</Link>
             <Link to="/pricing" className="block py-2 text-gray-300 hover:text-white">Pricing</Link>
             <Link to="/admin" className="block py-2 text-gray-300 hover:text-white">Admin</Link>
-            <button className="btn-primary w-full mt-4 text-sm">
-              Connect Wallet
-            </button>
+            {account ? (
+              <button
+                onClick={disconnect}
+                className="btn-primary w-full mt-4 text-sm flex items-center justify-center space-x-2"
+              >
+                <span className="w-2 h-2 rounded-full bg-crypto-success inline-block"></span>
+                <span>{shortAddress}</span>
+              </button>
+            ) : (
+              <button
+                onClick={connect}
+                disabled={isConnecting}
+                className="btn-primary w-full mt-4 text-sm disabled:opacity-60"
+              >
+                {isConnecting ? 'Connecting…' : 'Connect Wallet'}
+              </button>
+            )}
           </div>
         )}
       </div>
