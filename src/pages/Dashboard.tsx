@@ -16,6 +16,7 @@ interface BalanceLineItem {
   id: string
   label: string
   value: number
+  change24h: number
 }
 
 export default function Dashboard() {
@@ -23,12 +24,12 @@ export default function Dashboard() {
   const [cryptos, setCryptos] = useState<CryptoData[]>([])
   const [loading, setLoading] = useState(true)
   const additionalAssets: BalanceLineItem[] = [
-    { id: 'cash', label: 'USD Cash Reserve', value: 4200.00 },
-    { id: 'staking', label: 'Staking Rewards', value: 980.45 },
+    { id: 'cash', label: 'USD Cash Reserve', value: 4200.00, change24h: 0.2 },
+    { id: 'staking', label: 'Staking Rewards', value: 980.45, change24h: 1.1 },
   ]
   const liabilities: BalanceLineItem[] = [
-    { id: 'margin', label: 'Margin Balance', value: 1850.25 },
-    { id: 'loan', label: 'Hardware Wallet Loan', value: 640.00 },
+    { id: 'margin', label: 'Margin Balance', value: 1850.25, change24h: -0.9 },
+    { id: 'loan', label: 'Hardware Wallet Loan', value: 640.00, change24h: 0.4 },
   ]
 
   // Sample data - replace with real API calls
@@ -50,11 +51,21 @@ export default function Dashboard() {
   const totalAssets = holdingsValue + additionalAssets.reduce((sum, asset) => sum + asset.value, 0)
   const totalLiabilities = liabilities.reduce((sum, liability) => sum + liability.value, 0)
   const netWorth = totalAssets - totalLiabilities
-  const netWorthChange = cryptos.reduce(
+  const holdingsChange = cryptos.reduce(
     (sum, crypto) => sum + ((crypto.price * crypto.quantity) * (crypto.change24h / 100)),
     0,
   )
-  const netWorthChangePercent = netWorth === 0 ? 0 : (netWorthChange / netWorth) * 100
+  const assetChange = holdingsChange + additionalAssets.reduce(
+    (sum, asset) => sum + (asset.value * (asset.change24h / 100)),
+    0,
+  )
+  const liabilityChange = liabilities.reduce(
+    (sum, liability) => sum + (liability.value * (liability.change24h / 100)),
+    0,
+  )
+  const netWorthChange = assetChange - liabilityChange
+  const previousNetWorth = netWorth - netWorthChange
+  const netWorthChangePercent = previousNetWorth === 0 ? 0 : (netWorthChange / previousNetWorth) * 100
 
   return (
     <div className="min-h-screen bg-crypto-dark">
@@ -105,9 +116,14 @@ export default function Dashboard() {
                 <p className="text-3xl font-bold text-crypto-success">
                   ${totalAssets.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </p>
+                <p className={`text-sm mt-2 ${assetChange >= 0 ? 'text-crypto-success' : 'text-crypto-danger'}`}>
+                  {assetChange >= 0 ? '+' : '-'}${Math.abs(assetChange).toLocaleString('en-US', { minimumFractionDigits: 2 })} today
+                </p>
               </div>
               <div className="bg-green-500/20 p-3 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-crypto-success" />
+                {assetChange >= 0
+                  ? <TrendingUp className="w-6 h-6 text-crypto-success" />
+                  : <TrendingDown className="w-6 h-6 text-crypto-danger" />}
               </div>
             </div>
           </div>
@@ -119,9 +135,14 @@ export default function Dashboard() {
                 <p className="text-3xl font-bold text-crypto-danger">
                   ${totalLiabilities.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </p>
+                <p className={`text-sm mt-2 ${liabilityChange <= 0 ? 'text-crypto-success' : 'text-crypto-danger'}`}>
+                  {liabilityChange >= 0 ? '+' : '-'}${Math.abs(liabilityChange).toLocaleString('en-US', { minimumFractionDigits: 2 })} today
+                </p>
               </div>
               <div className="bg-red-500/20 p-3 rounded-lg">
-                <TrendingDown className="w-6 h-6 text-crypto-danger" />
+                {liabilityChange <= 0
+                  ? <TrendingDown className="w-6 h-6 text-crypto-success" />
+                  : <TrendingUp className="w-6 h-6 text-crypto-danger" />}
               </div>
             </div>
           </div>
