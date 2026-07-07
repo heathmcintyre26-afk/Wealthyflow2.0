@@ -51,7 +51,7 @@ export default function Admin() {
         </div>
         <h2 className="text-3xl font-bold">Admin Access</h2>
         <p className="text-gray-400 max-w-md">
-          Connect the authorised admin wallet to access this page.
+          Connect the authorized admin wallet to access this page.
         </p>
         <button
           onClick={connect}
@@ -73,7 +73,7 @@ export default function Admin() {
         </div>
         <h2 className="text-3xl font-bold">Access Denied</h2>
         <p className="text-gray-400 max-w-md">
-          The connected wallet is not authorised to view this page.
+          The connected wallet is not authorized to view this page.
           Please connect the admin wallet to continue.
         </p>
         <p className="text-xs text-gray-500 font-mono break-all max-w-xs">{account}</p>
