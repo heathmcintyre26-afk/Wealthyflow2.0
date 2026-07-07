@@ -24,6 +24,7 @@ export default function Dashboard() {
   const [cryptos, setCryptos] = useState<CryptoData[]>([])
   const [loading, setLoading] = useState(true)
   const currencyFormat = { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+  const quantityFormat = { minimumFractionDigits: 0, maximumFractionDigits: 4 }
   const additionalAssets: BalanceLineItem[] = [
     { id: 'cash', label: 'USD Cash Reserve', value: 4200.00, change24h: 0.2 },
     { id: 'staking', label: 'Staking Rewards', value: 980.45, change24h: 1.1 },
@@ -66,8 +67,9 @@ export default function Dashboard() {
   )
   const netWorthChange = assetChange - liabilityChange
   const previousNetWorth = netWorth - netWorthChange
-  const netWorthChangePercent = previousNetWorth === 0 ? 0 : (netWorthChange / previousNetWorth) * 100
+  const netWorthChangePercent = previousNetWorth === 0 ? 0 : (netWorthChange / Math.abs(previousNetWorth)) * 100
   const formatCurrency = (value: number) => value.toLocaleString('en-US', currencyFormat)
+  const formatQuantity = (value: number) => value.toLocaleString('en-US', quantityFormat)
   const formatCurrencyChange = (value: number) => {
     const prefix = value > 0 ? '+' : value < 0 ? '-' : ''
     return `${prefix}$${Math.abs(value).toLocaleString('en-US', currencyFormat)}`
@@ -193,7 +195,7 @@ export default function Dashboard() {
               {[
                 ...cryptos.map((crypto) => ({
                   id: crypto.id,
-                  label: `${crypto.name} (${crypto.quantity.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 4 })} ${crypto.symbol})`,
+                  label: `${crypto.name} (${formatQuantity(crypto.quantity)} ${crypto.symbol})`,
                   value: crypto.price * crypto.quantity,
                 })),
                 ...additionalAssets,
@@ -260,7 +262,7 @@ export default function Dashboard() {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-gray-300">
-                        {crypto.quantity.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 4 })}
+                        {formatQuantity(crypto.quantity)}
                       </td>
                       <td className="px-6 py-4 font-semibold">
                         ${formatCurrency(crypto.price)}
