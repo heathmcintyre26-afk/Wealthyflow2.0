@@ -50,10 +50,10 @@ export default function Dashboard() {
   const totalAssets = holdingsValue + additionalAssets.reduce((sum, asset) => sum + asset.value, 0)
   const totalLiabilities = liabilities.reduce((sum, liability) => sum + liability.value, 0)
   const netWorth = totalAssets - totalLiabilities
-  const holdingsChangePercent = holdingsValue === 0
-    ? 0
-    : cryptos.reduce((sum, crypto) => sum + ((crypto.price * crypto.quantity) * crypto.change24h), 0) / holdingsValue
-  const netWorthChange = holdingsValue * (holdingsChangePercent / 100)
+  const netWorthChange = cryptos.reduce(
+    (sum, crypto) => sum + ((crypto.price * crypto.quantity) * (crypto.change24h / 100)),
+    0,
+  )
   const netWorthChangePercent = netWorth === 0 ? 0 : (netWorthChange / netWorth) * 100
 
   return (
@@ -153,7 +153,7 @@ export default function Dashboard() {
               {[
                 ...cryptos.map((crypto) => ({
                   id: crypto.id,
-                  label: `${crypto.name} (${crypto.quantity.toLocaleString()} ${crypto.symbol})`,
+                  label: `${crypto.name} (${crypto.quantity.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 4 })} ${crypto.symbol})`,
                   value: crypto.price * crypto.quantity,
                 })),
                 ...additionalAssets,
@@ -220,7 +220,7 @@ export default function Dashboard() {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-gray-300">
-                        {crypto.quantity.toLocaleString()}
+                        {crypto.quantity.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 4 })}
                       </td>
                       <td className="px-6 py-4 font-semibold">
                         ${crypto.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}
