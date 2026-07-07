@@ -162,7 +162,10 @@ export default function CourseDetail() {
     try {
       await enroll(user.id, courseId)
       if (course.price > 0) {
-        await insertTransaction({ user_id: user.id, course_id: courseId, amount: course.price, status: 'completed' })
+        // For paid courses, record a pending transaction. The status is updated
+        // to 'completed' server-side after payment is confirmed (e.g., via
+        // a Stripe webhook) — never trust the client to mark payment complete.
+        await insertTransaction({ user_id: user.id, course_id: courseId, amount: course.price, status: 'pending' })
       }
       setIsEnrolled(true)
     } catch (err) {

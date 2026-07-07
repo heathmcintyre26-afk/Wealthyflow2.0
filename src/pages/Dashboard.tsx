@@ -64,7 +64,8 @@ export default function Dashboard() {
       let h = await fetchHoldings(user.id)
       // Seed default holdings for brand-new users
       if (h.length === 0) {
-        await Promise.all(DEFAULT_HOLDINGS.map((dh) => upsertHolding({ ...dh, user_id: user.id })))
+        // Seed default holdings for brand-new users; tolerate partial failures
+        await Promise.allSettled(DEFAULT_HOLDINGS.map((dh) => upsertHolding({ ...dh, user_id: user.id })))
         h = await fetchHoldings(user.id)
       }
       setHoldings(h)
@@ -306,7 +307,7 @@ export default function Dashboard() {
                           defaultValue={r.quantity}
                           onBlur={(e) => {
                             const v = parseFloat(e.target.value)
-                            if (!isNaN(v) && v !== r.quantity) handleUpdateQty(r, v)
+                            if (!isNaN(v) && v >= 0 && v !== r.quantity) handleUpdateQty(r, v)
                           }}
                           className="w-28 bg-white/10 border border-white/20 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-crypto-accent"
                         />

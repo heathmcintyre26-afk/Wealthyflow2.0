@@ -9,6 +9,7 @@ create table if not exists public.profiles (
   email            text,
   subscription_tier text not null default 'free'
     check (subscription_tier in ('free', 'pro', 'premium')),
+  is_admin         boolean not null default false,
   created_at       timestamptz not null default now(),
   updated_at       timestamptz not null default now()
 );
@@ -92,10 +93,11 @@ create policy "transactions: admin reads all" on public.transactions
   for select using (
     exists (
       select 1 from public.profiles
-      where id = auth.uid() and subscription_tier = 'premium'
+      where id = auth.uid() and is_admin = true
     )
   );
 
--- Allow backend / service-role to insert transactions
+-- Allow backend / service-role to insert transactions.
+-- Restrict to Supabase service role so only trusted server-side code can insert.
 create policy "transactions: service insert" on public.transactions
-  for insert with check (true);
+  for insert with check (auth.role() = 'service_role');

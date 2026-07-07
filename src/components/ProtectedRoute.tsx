@@ -4,12 +4,12 @@ import { useAuth } from '../hooks/useAuth'
 
 interface Props {
   children: ReactNode
-  /** Role required. 'admin' checks for 'premium' tier as a proxy until a proper role column exists. */
+  /** When true, requires the user to have is_admin = true in their profile. */
   requireAdmin?: boolean
 }
 
 export default function ProtectedRoute({ children, requireAdmin = false }: Props) {
-  const { user, tier, isLoading } = useAuth()
+  const { user, isAdmin, isLoading } = useAuth()
 
   if (isLoading) {
     return (
@@ -21,13 +21,13 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Props
 
   if (!user) return <Navigate to="/auth" replace />
 
-  if (requireAdmin && tier !== 'premium') {
+  if (requireAdmin && !isAdmin) {
     return (
       <div className="min-h-screen bg-crypto-dark flex items-center justify-center px-4 text-center">
         <div className="glass-effect p-12 max-w-md">
           <h2 className="text-2xl font-bold mb-3">Admin Access Required</h2>
-          <p className="text-gray-400 mb-6">This page is restricted to Premium account holders.</p>
-          <a href="/pricing" className="btn-premium">Upgrade to Premium</a>
+          <p className="text-gray-400 mb-6">This page is restricted to administrators.</p>
+          <a href="/" className="btn-secondary">Go Home</a>
         </div>
       </div>
     )

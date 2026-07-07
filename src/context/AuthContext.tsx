@@ -7,17 +7,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [tier, setTier] = useState<SubscriptionTier>('free')
+  const [isAdmin, setIsAdmin] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   const fetchTier = useCallback(async (userId: string) => {
     const { data } = await supabase
       .from('profiles')
-      .select('subscription_tier')
+      .select('subscription_tier, is_admin')
       .eq('id', userId)
       .single()
     if (data?.subscription_tier) {
       setTier(data.subscription_tier as SubscriptionTier)
     }
+    setIsAdmin(data?.is_admin === true)
   }, [])
 
   useEffect(() => {
@@ -35,6 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         fetchTier(s.user.id)
       } else {
         setTier('free')
+        setIsAdmin(false)
       }
     })
 
@@ -56,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, session, tier, isLoading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, tier, isAdmin, isLoading, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   )

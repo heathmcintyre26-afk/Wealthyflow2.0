@@ -18,9 +18,11 @@ export default function Pricing() {
       alert('Stripe is not yet configured. Set VITE_STRIPE_PRO_PRICE_ID / VITE_STRIPE_PREMIUM_PRICE_ID in your .env.local.')
       return
     }
-    // Redirect to Stripe Checkout via a Supabase Edge Function or Vercel serverless function.
-    // The function creates a checkout session and returns the hosted URL.
-    const checkoutUrl = `/api/stripe/checkout?price_id=${priceId}&user_id=${user.id}`
+    // POST to a backend endpoint (Supabase Edge Function or Vercel serverless function).
+    // The function reads the authenticated user from the session cookie/JWT,
+    // creates a Stripe Checkout session, and redirects. The user ID is NOT
+    // passed in the URL to avoid leaking it in logs or browser history.
+    const checkoutUrl = `/api/stripe/checkout?price_id=${encodeURIComponent(priceId)}`
     window.location.href = checkoutUrl
   }
 

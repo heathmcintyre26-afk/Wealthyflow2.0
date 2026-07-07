@@ -119,18 +119,23 @@ const COINGECKO_BASE = 'https://api.coingecko.com/api/v3'
 export async function fetchCoinPrices(coinIds: string[]): Promise<CoinPrice[]> {
   if (coinIds.length === 0) return []
   const ids = coinIds.join(',')
-  const { data } = await axios.get<CoinPrice[]>(
-    `${COINGECKO_BASE}/coins/markets`,
-    {
-      params: {
-        vs_currency: 'usd',
-        ids,
-        order: 'market_cap_desc',
-        per_page: coinIds.length,
-        page: 1,
-        sparkline: false,
+  try {
+    const { data } = await axios.get<CoinPrice[]>(
+      `${COINGECKO_BASE}/coins/markets`,
+      {
+        params: {
+          vs_currency: 'usd',
+          ids,
+          order: 'market_cap_desc',
+          per_page: coinIds.length,
+          page: 1,
+          sparkline: false,
+        },
       },
-    },
-  )
-  return data
+    )
+    return data
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    throw new Error(`Failed to fetch coin prices from CoinGecko: ${message}`)
+  }
 }

@@ -7,6 +7,7 @@ export interface AuthContextType {
   user: User | null
   session: Session | null
   tier: SubscriptionTier
+  isAdmin: boolean
   isLoading: boolean
   signUp: (email: string, password: string) => Promise<string | null>
   signIn: (email: string, password: string) => Promise<string | null>

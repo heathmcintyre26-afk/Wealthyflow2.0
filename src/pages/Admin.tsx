@@ -3,6 +3,15 @@ import { Wallet, Lock, LogOut, Copy, Check, RefreshCw } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { fetchTransactions, type Transaction } from '../lib/api'
 
+const COURSE_NAMES: Record<number, string> = {
+  1: 'Crypto Fundamentals',
+  2: 'Technical Analysis Mastery',
+  3: 'DeFi & Smart Contracts',
+  4: 'Portfolio Management Pro',
+  5: 'Risk Management & Trading Psychology',
+  6: 'Advanced Trading Algorithms',
+}
+
 export default function Admin() {
   const { user } = useAuth()
   const [adminWallet, setAdminWallet] = useState<string | null>(null)
@@ -191,7 +200,7 @@ export default function Admin() {
                     <div key={tx.id} className="flex items-center justify-between p-4 border-b border-white/10 last:border-0">
                       <div>
                         <p className="font-semibold">
-                          {tx.course_id ? `Course #${tx.course_id}` : 'Subscription'}
+                          {tx.course_id ? (COURSE_NAMES[tx.course_id] ?? `Course #${tx.course_id}`) : 'Subscription'}
                         </p>
                         <p className="text-sm text-gray-400">
                           {tx.created_at ? new Date(tx.created_at).toLocaleDateString() : '—'}
