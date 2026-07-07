@@ -1,23 +1,5 @@
-import { createContext, useState, useEffect, useCallback, ReactNode } from 'react'
-
-interface WalletContextType {
-  account: string | null
-  chainId: number | null
-  isConnecting: boolean
-  error: string | null
-  connect: () => Promise<void>
-  disconnect: () => void
-}
-
-interface EthereumProvider {
-  request: (args: { method: string }) => Promise<unknown>
-  on: (event: string, handler: (data: unknown) => void) => void
-  removeListener: (event: string, handler: (data: unknown) => void) => void
-}
-
-type WindowWithEthereum = Window & { ethereum?: EthereumProvider }
-
-export const WalletContext = createContext<WalletContextType | null>(null)
+import { useState, useEffect, useCallback, ReactNode } from 'react'
+import { WalletContext, WindowWithEthereum } from './wallet'
 
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [account, setAccount] = useState<string | null>(null)
