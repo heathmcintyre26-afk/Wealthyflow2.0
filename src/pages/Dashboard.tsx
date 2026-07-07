@@ -23,6 +23,7 @@ export default function Dashboard() {
   const { account, connect, isConnecting } = useWallet()
   const [cryptos, setCryptos] = useState<CryptoData[]>([])
   const [loading, setLoading] = useState(true)
+  const currencyFormat = { minimumFractionDigits: 2, maximumFractionDigits: 2 }
   const additionalAssets: BalanceLineItem[] = [
     { id: 'cash', label: 'USD Cash Reserve', value: 4200.00, change24h: 0.2 },
     { id: 'staking', label: 'Staking Rewards', value: 980.45, change24h: 1.1 },
@@ -66,6 +67,20 @@ export default function Dashboard() {
   const netWorthChange = assetChange - liabilityChange
   const previousNetWorth = netWorth - netWorthChange
   const netWorthChangePercent = previousNetWorth === 0 ? 0 : (netWorthChange / previousNetWorth) * 100
+  const formatCurrency = (value: number) => value.toLocaleString('en-US', currencyFormat)
+  const formatCurrencyChange = (value: number) => {
+    const prefix = value > 0 ? '+' : value < 0 ? '-' : ''
+    return `${prefix}$${Math.abs(value).toLocaleString('en-US', currencyFormat)}`
+  }
+  const formatPercentChange = (value: number) => {
+    const prefix = value > 0 ? '+' : value < 0 ? '' : ''
+    return `${prefix}${value.toFixed(2)}%`
+  }
+  const getChangeClass = (value: number, positiveIsGood = true) => {
+    if (value === 0) return 'text-gray-400'
+    if (positiveIsGood) return value > 0 ? 'text-crypto-success' : 'text-crypto-danger'
+    return value < 0 ? 'text-crypto-success' : 'text-crypto-danger'
+  }
 
   return (
     <div className="min-h-screen bg-crypto-dark">
@@ -101,7 +116,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm mb-2">Net Worth</p>
-                <p className="text-3xl font-bold">${netWorth.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
+                <p className="text-3xl font-bold">${formatCurrency(netWorth)}</p>
               </div>
               <div className="gradient-crypto p-3 rounded-lg">
                 <DollarSign className="w-6 h-6" />
@@ -114,16 +129,18 @@ export default function Dashboard() {
               <div>
                 <p className="text-gray-400 text-sm mb-2">Total Assets</p>
                 <p className="text-3xl font-bold text-crypto-success">
-                  ${totalAssets.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  ${formatCurrency(totalAssets)}
                 </p>
-                <p className={`text-sm mt-2 ${assetChange >= 0 ? 'text-crypto-success' : 'text-crypto-danger'}`}>
-                  {assetChange >= 0 ? '+' : '-'}${Math.abs(assetChange).toLocaleString('en-US', { minimumFractionDigits: 2 })} today
+                <p className={`text-sm mt-2 ${getChangeClass(assetChange)}`}>
+                  {formatCurrencyChange(assetChange)} today
                 </p>
               </div>
               <div className="bg-green-500/20 p-3 rounded-lg">
-                {assetChange >= 0
+                {assetChange > 0
                   ? <TrendingUp className="w-6 h-6 text-crypto-success" />
-                  : <TrendingDown className="w-6 h-6 text-crypto-danger" />}
+                  : assetChange < 0
+                    ? <TrendingDown className="w-6 h-6 text-crypto-danger" />
+                    : <Target className="w-6 h-6 text-crypto-accent" />}
               </div>
             </div>
           </div>
@@ -133,16 +150,18 @@ export default function Dashboard() {
               <div>
                 <p className="text-gray-400 text-sm mb-2">Total Liabilities</p>
                 <p className="text-3xl font-bold text-crypto-danger">
-                  ${totalLiabilities.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  ${formatCurrency(totalLiabilities)}
                 </p>
-                <p className={`text-sm mt-2 ${liabilityChange <= 0 ? 'text-crypto-success' : 'text-crypto-danger'}`}>
-                  {liabilityChange >= 0 ? '+' : '-'}${Math.abs(liabilityChange).toLocaleString('en-US', { minimumFractionDigits: 2 })} today
+                <p className={`text-sm mt-2 ${getChangeClass(liabilityChange, false)}`}>
+                  {formatCurrencyChange(liabilityChange)} today
                 </p>
               </div>
               <div className="bg-red-500/20 p-3 rounded-lg">
-                {liabilityChange <= 0
-                  ? <TrendingDown className="w-6 h-6 text-crypto-success" />
-                  : <TrendingUp className="w-6 h-6 text-crypto-danger" />}
+                {liabilityChange < 0
+                  ? <TrendingUp className="w-6 h-6 text-crypto-success" />
+                  : liabilityChange > 0
+                    ? <TrendingDown className="w-6 h-6 text-crypto-danger" />
+                    : <Target className="w-6 h-6 text-crypto-accent" />}
               </div>
             </div>
           </div>
@@ -151,11 +170,11 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm mb-2">24h Net Worth Change</p>
-                <p className={`text-3xl font-bold ${netWorthChange >= 0 ? 'text-crypto-success' : 'text-crypto-danger'}`}>
-                  {netWorthChange >= 0 ? '+' : ''}${Math.abs(netWorthChange).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                <p className={`text-3xl font-bold ${getChangeClass(netWorthChange)}`}>
+                  {formatCurrencyChange(netWorthChange)}
                 </p>
-                <p className={`text-sm mt-2 ${netWorthChangePercent >= 0 ? 'text-crypto-success' : 'text-crypto-danger'}`}>
-                  {netWorthChangePercent >= 0 ? '+' : ''}{netWorthChangePercent.toFixed(2)}%
+                <p className={`text-sm mt-2 ${getChangeClass(netWorthChangePercent)}`}>
+                  {formatPercentChange(netWorthChangePercent)}
                 </p>
               </div>
               <div className="bg-blue-500/20 p-3 rounded-lg">
@@ -182,7 +201,7 @@ export default function Dashboard() {
                 <div key={asset.id} className="px-6 py-4 flex items-center justify-between">
                   <p className="text-gray-300">{asset.label}</p>
                   <p className="font-semibold text-crypto-success">
-                    ${asset.value.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    ${formatCurrency(asset.value)}
                   </p>
                 </div>
               ))}
@@ -198,7 +217,7 @@ export default function Dashboard() {
                 <div key={liability.id} className="px-6 py-4 flex items-center justify-between">
                   <p className="text-gray-300">{liability.label}</p>
                   <p className="font-semibold text-crypto-danger">
-                    ${liability.value.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    ${formatCurrency(liability.value)}
                   </p>
                 </div>
               ))}
@@ -244,10 +263,10 @@ export default function Dashboard() {
                         {crypto.quantity.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 4 })}
                       </td>
                       <td className="px-6 py-4 font-semibold">
-                        ${crypto.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        ${formatCurrency(crypto.price)}
                       </td>
                       <td className="px-6 py-4 font-semibold text-crypto-success">
-                        ${(crypto.price * crypto.quantity).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        ${formatCurrency(crypto.price * crypto.quantity)}
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-semibold ${
