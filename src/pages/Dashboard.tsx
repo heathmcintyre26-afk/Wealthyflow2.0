@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { TrendingUp, TrendingDown, DollarSign, Target, Wallet, AlertCircle, RefreshCw } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { useWallet } from '../hooks/useWallet'
 
@@ -348,9 +349,12 @@ export default function Dashboard() {
                         ${(crypto.marketCap / 1000000000).toFixed(0)}B
                       </td>
                       <td className="px-6 py-4">
-                        <button className="text-crypto-accent hover:text-blue-400 font-semibold transition">
+                        <Link
+                          to="/pricing"
+                          className="text-crypto-accent hover:text-blue-400 font-semibold transition"
+                        >
                           Trade
-                        </button>
+                        </Link>
                       </td>
                     </tr>
                   ))}

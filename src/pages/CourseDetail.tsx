@@ -1,10 +1,12 @@
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, Navigate } from 'react-router-dom'
 import { Clock, Users, Star, ArrowLeft } from 'lucide-react'
 import { getCourseById } from '../data/courses'
 
 export default function CourseDetail() {
   const { id } = useParams()
-  const course = getCourseById(id) ?? getCourseById('1')!
+  const course = getCourseById(id)
+
+  if (!course) return <Navigate to="/404" replace />
 
   return (
     <div className="min-h-screen bg-crypto-dark">

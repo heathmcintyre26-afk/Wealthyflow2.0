@@ -77,12 +77,12 @@ export default function Navbar() {
         {/* Mobile Menu */}
         {isOpen && (
           <div className="md:hidden pb-4 border-t border-white/10">
-            <Link to="/" className="block py-2 text-gray-300 hover:text-white">Home</Link>
-            <Link to="/dashboard" className="block py-2 text-gray-300 hover:text-white">Dashboard</Link>
-            <Link to="/courses" className="block py-2 text-gray-300 hover:text-white">Courses</Link>
-            <Link to="/pricing" className="block py-2 text-gray-300 hover:text-white">Pricing</Link>
+            <Link to="/" className="block py-2 text-gray-300 hover:text-white" onClick={() => setIsOpen(false)}>Home</Link>
+            <Link to="/dashboard" className="block py-2 text-gray-300 hover:text-white" onClick={() => setIsOpen(false)}>Dashboard</Link>
+            <Link to="/courses" className="block py-2 text-gray-300 hover:text-white" onClick={() => setIsOpen(false)}>Courses</Link>
+            <Link to="/pricing" className="block py-2 text-gray-300 hover:text-white" onClick={() => setIsOpen(false)}>Pricing</Link>
             {isAdmin && (
-              <Link to="/admin" className="block py-2 text-gray-300 hover:text-white">Admin</Link>
+              <Link to="/admin" className="block py-2 text-gray-300 hover:text-white" onClick={() => setIsOpen(false)}>Admin</Link>
             )}
             {account ? (
               <button

@@ -1,38 +1,19 @@
 import { useState } from 'react'
-import { Wallet, Lock, LogOut, Copy, Check, ShieldAlert } from 'lucide-react'
+import { Wallet, Lock, Copy, Check, ShieldAlert } from 'lucide-react'
 import { useWallet } from '../hooks/useWallet'
 
 const ADMIN_ADDRESS = (import.meta.env.VITE_ADMIN_ADDRESS as string | undefined)?.toLowerCase()
 
 export default function Admin() {
-  const { account, connect, isConnecting } = useWallet()
-  const [adminWallet, setAdminWallet] = useState<string | null>(null)
-  const [walletInput, setWalletInput] = useState('')
+  const { account, connect, isConnecting, disconnect } = useWallet()
   const [copied, setCopied] = useState(false)
-  const [isConnected, setIsConnected] = useState(false)
 
-  // Simulated wallet data
+  // Simulated revenue data
   const walletData = {
-    address: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
     balance: 45.25,
     revenue: 12450.50,
     pendingPayouts: 3200.00,
     totalEarnings: 52650.50,
-  }
-
-  const handleConnect = () => {
-    if (walletInput.toLowerCase().startsWith('0x')) {
-      setAdminWallet(walletInput)
-      setIsConnected(true)
-      setWalletInput('')
-    } else {
-      alert('Please enter a valid Ethereum wallet address')
-    }
-  }
-
-  const handleDisconnect = () => {
-    setAdminWallet(null)
-    setIsConnected(false)
   }
 
   const handleCopy = (text: string) => {
@@ -95,13 +76,13 @@ export default function Admin() {
           <Lock size={20} className="text-yellow-500 flex-shrink-0 mt-0.5" />
           <div>
             <p className="font-semibold text-yellow-400">Security Notice</p>
-            <p className="text-gray-300 text-sm">Only connect a dedicated wallet for revenue collection. Never share your private keys.</p>
+            <p className="text-gray-300 text-sm">Only use a dedicated wallet for revenue collection. Never share your private keys.</p>
           </div>
         </div>
 
         {/* Main Content */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Left Column - Wallet Connection */}
+          {/* Left Column - Connected Wallet */}
           <div className="md:col-span-1">
             <div className="glass-effect p-8">
               <h2 className="text-2xl font-bold mb-6 flex items-center space-x-2">
@@ -109,59 +90,34 @@ export default function Admin() {
                 <span>Admin Wallet</span>
               </h2>
 
-              {!isConnected ? (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-gray-400 text-sm mb-2">Wallet Address</label>
-                    <input
-                      type="text"
-                      placeholder="0x..."
-                      value={walletInput}
-                      onChange={(e) => setWalletInput(e.target.value)}
-                      className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-crypto-accent"
-                    />
-                  </div>
-                  <button
-                    onClick={handleConnect}
-                    className="w-full btn-primary"
-                  >
-                    Connect Wallet
-                  </button>
-                  <p className="text-xs text-gray-400 text-center">
-                    This enables automated revenue distribution
-                  </p>
+              <div className="space-y-4">
+                <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                  <p className="text-sm text-green-400 mb-2">✓ Wallet Connected</p>
+                  <p className="font-mono text-sm text-white break-all">{account}</p>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
-                    <p className="text-sm text-green-400 mb-2">✓ Wallet Connected</p>
-                    <p className="font-mono text-sm text-white break-all">{adminWallet}</p>
-                  </div>
-                  <button
-                    onClick={() => handleCopy(adminWallet ?? '')}
-                    className="w-full flex items-center justify-center space-x-2 bg-white/10 hover:bg-white/20 rounded-lg px-4 py-2 transition"
-                  >
-                    {copied ? (
-                      <>
-                        <Check size={18} className="text-crypto-success" />
-                        <span>Copied!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy size={18} />
-                        <span>Copy Address</span>
-                      </>
-                    )}
-                  </button>
-                  <button
-                    onClick={handleDisconnect}
-                    className="w-full flex items-center justify-center space-x-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg px-4 py-2 transition"
-                  >
-                    <LogOut size={18} />
-                    <span>Disconnect</span>
-                  </button>
-                </div>
-              )}
+                <button
+                  onClick={() => handleCopy(account)}
+                  className="w-full flex items-center justify-center space-x-2 bg-white/10 hover:bg-white/20 rounded-lg px-4 py-2 transition"
+                >
+                  {copied ? (
+                    <>
+                      <Check size={18} className="text-crypto-success" />
+                      <span>Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={18} />
+                      <span>Copy Address</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={disconnect}
+                  className="w-full flex items-center justify-center space-x-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg px-4 py-2 transition"
+                >
+                  <span>Disconnect</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -215,21 +171,19 @@ export default function Admin() {
             </div>
 
             {/* Withdrawal Options */}
-            {isConnected && (
-              <div className="glass-effect p-8">
-                <h3 className="text-xl font-bold mb-4">Automatic Payouts</h3>
-                <p className="text-gray-300 mb-6">All course revenue is automatically distributed to your connected wallet every week.</p>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <input type="checkbox" id="auto-payout" defaultChecked className="w-4 h-4" />
-                    <label htmlFor="auto-payout" className="text-gray-300">Enable automatic payouts</label>
-                  </div>
-                  <button className="w-full btn-primary">
-                    Withdraw ${walletData.pendingPayouts.toLocaleString()} Now
-                  </button>
+            <div className="glass-effect p-8">
+              <h3 className="text-xl font-bold mb-4">Automatic Payouts</h3>
+              <p className="text-gray-300 mb-6">All course revenue is automatically distributed to your connected wallet every week.</p>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <input type="checkbox" id="auto-payout" defaultChecked className="w-4 h-4" />
+                  <label htmlFor="auto-payout" className="text-gray-300">Enable automatic payouts</label>
                 </div>
+                <button className="w-full btn-primary">
+                  Withdraw ${walletData.pendingPayouts.toLocaleString()} Now
+                </button>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>

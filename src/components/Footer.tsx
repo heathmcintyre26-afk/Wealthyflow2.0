@@ -1,4 +1,5 @@
 import { Github, Twitter, Linkedin, Mail } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -19,9 +20,9 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Product</h4>
             <ul className="space-y-2 text-gray-400 text-sm">
-              <li><a href="/dashboard" className="hover:text-white transition">Dashboard</a></li>
-              <li><a href="/courses" className="hover:text-white transition">Courses</a></li>
-              <li><a href="/pricing" className="hover:text-white transition">Pricing</a></li>
+              <li><Link to="/dashboard" className="hover:text-white transition">Dashboard</Link></li>
+              <li><Link to="/courses" className="hover:text-white transition">Courses</Link></li>
+              <li><Link to="/pricing" className="hover:text-white transition">Pricing</Link></li>
               <li><a href="#" className="hover:text-white transition">Security</a></li>
             </ul>
           </div>
