@@ -94,7 +94,8 @@ export default function Dashboard() {
       )
       setError(null)
       setLastUpdated(new Date())
-    } catch {
+    } catch (err) {
+      console.error('CoinGecko API error:', err)
       setError('Unable to fetch live prices. Retrying shortly…')
     } finally {
       setLoading(false)
