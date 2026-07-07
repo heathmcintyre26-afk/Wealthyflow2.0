@@ -3,6 +3,8 @@ import { Menu, X, Wallet } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useWallet } from '../hooks/useWallet'
 
+const ADMIN_ADDRESS = (import.meta.env.VITE_ADMIN_ADDRESS as string | undefined)?.toLowerCase()
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const { account, isConnecting, error, connect, disconnect } = useWallet()
@@ -10,6 +12,8 @@ export default function Navbar() {
   const shortAddress = account
     ? `${account.slice(0, 6)}...${account.slice(-4)}`
     : null
+
+  const isAdmin = !ADMIN_ADDRESS || (!!account && account.toLowerCase() === ADMIN_ADDRESS)
 
   return (
     <nav className="bg-crypto-light border-b border-white/10 sticky top-0 z-50">
@@ -47,9 +51,11 @@ export default function Navbar() {
                 {isConnecting ? 'Connecting…' : 'Connect Wallet'}
               </button>
             )}
-            <Link to="/admin" className="text-gray-300 hover:text-crypto-accent transition text-sm">
-              Admin
-            </Link>
+            {isAdmin && (
+              <Link to="/admin" className="text-gray-300 hover:text-crypto-accent transition text-sm">
+                Admin
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -75,7 +81,9 @@ export default function Navbar() {
             <Link to="/dashboard" className="block py-2 text-gray-300 hover:text-white">Dashboard</Link>
             <Link to="/courses" className="block py-2 text-gray-300 hover:text-white">Courses</Link>
             <Link to="/pricing" className="block py-2 text-gray-300 hover:text-white">Pricing</Link>
-            <Link to="/admin" className="block py-2 text-gray-300 hover:text-white">Admin</Link>
+            {isAdmin && (
+              <Link to="/admin" className="block py-2 text-gray-300 hover:text-white">Admin</Link>
+            )}
             {account ? (
               <button
                 onClick={disconnect}
