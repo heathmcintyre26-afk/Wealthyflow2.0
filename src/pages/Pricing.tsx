@@ -1,7 +1,8 @@
 import { Check, Crown } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 export default function Pricing() {
+  const navigate = useNavigate()
   const tiers = [
     {
       name: 'Free',
@@ -91,6 +92,7 @@ export default function Pricing() {
 
                 {/* CTA Button */}
                 <button
+                  onClick={() => navigate('/dashboard')}
                   className={`w-full mb-8 py-3 rounded-lg font-semibold transition ${
                     tier.highlighted
                       ? 'btn-premium'
