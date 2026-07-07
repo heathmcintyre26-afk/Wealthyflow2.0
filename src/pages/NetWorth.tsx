@@ -40,7 +40,11 @@ interface StoredData {
 }
 
 function uid() {
-  return crypto.randomUUID()
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+  // Fallback for older browsers
+  return Date.now().toString(36) + Math.random().toString(36).slice(2)
 }
 
 function loadData(): StoredData {
@@ -115,7 +119,7 @@ function CategorySection({
                       type="number"
                       placeholder="0"
                       min="0"
-                      value={item.value}
+                      value={item.value || ''}
                       onChange={(e) => onChange(tpl.id, item.id, 'value', e.target.value)}
                       className="w-32 bg-white/5 border border-white/10 rounded pl-6 pr-3 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-crypto-accent"
                     />
@@ -148,9 +152,14 @@ export default function NetWorth() {
     setLiabilityItems(data.liabilityItems)
   }, [])
 
-  // Debounced persist — avoid excessive writes during rapid input
+  // Debounced persist — skip initial mount to avoid writing back data just loaded
+  const hasMountedRef = useRef(false)
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true
+      return
+    }
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
     saveTimerRef.current = setTimeout(() => {
       saveData({ assetItems, liabilityItems })
@@ -190,7 +199,7 @@ export default function NetWorth() {
     setAssetItems((prev) => ({
       ...prev,
       [catId]: (prev[catId] ?? []).map((i) =>
-        i.id === itemId ? { ...i, [field]: field === 'value' ? parseFloat(value) || 0 : value } : i
+        i.id === itemId ? { ...i, [field]: field === 'value' ? Math.max(0, parseFloat(value) || 0) : value } : i
       ),
     }))
   }
@@ -214,7 +223,7 @@ export default function NetWorth() {
     setLiabilityItems((prev) => ({
       ...prev,
       [catId]: (prev[catId] ?? []).map((i) =>
-        i.id === itemId ? { ...i, [field]: field === 'value' ? parseFloat(value) || 0 : value } : i
+        i.id === itemId ? { ...i, [field]: field === 'value' ? Math.max(0, parseFloat(value) || 0) : value } : i
       ),
     }))
   }
