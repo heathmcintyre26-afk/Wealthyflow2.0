@@ -2,8 +2,7 @@ import { useState } from 'react'
 import { Menu, X, Wallet } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useWallet } from '../hooks/useWallet'
-
-const ADMIN_ADDRESS = (import.meta.env.VITE_ADMIN_ADDRESS as string | undefined)?.toLowerCase()
+import { ADMIN_ADDRESS } from '../config/admin'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)

@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { Wallet, Lock, Copy, Check, ShieldAlert } from 'lucide-react'
 import { useWallet } from '../hooks/useWallet'
-
-const ADMIN_ADDRESS = (import.meta.env.VITE_ADMIN_ADDRESS as string | undefined)?.toLowerCase()
+import { ADMIN_ADDRESS } from '../config/admin'
 
 export default function Admin() {
   const { account, connect, isConnecting, disconnect } = useWallet()

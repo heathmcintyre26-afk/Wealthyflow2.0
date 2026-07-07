@@ -97,7 +97,7 @@ export default function Dashboard() {
       setLastUpdated(new Date())
     } catch (err) {
       console.error('CoinGecko API error:', err)
-      setError('Unable to fetch live prices. Retrying shortly…')
+      setError(`Unable to fetch live prices. Retrying in ${POLL_INTERVAL_MS / 1000} seconds…`)
     } finally {
       setLoading(false)
     }
