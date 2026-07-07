@@ -7,6 +7,7 @@ import Pricing from './pages/Pricing'
 import Courses from './pages/Courses'
 import CourseDetail from './pages/CourseDetail'
 import Admin from './pages/Admin'
+import NetWorth from './pages/NetWorth'
 import { WalletProvider } from './context/WalletContext'
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
             <Route path="/courses" element={<Courses />} />
             <Route path="/course/:id" element={<CourseDetail />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/net-worth" element={<NetWorth />} />
           </Routes>
         </main>
         <Footer />

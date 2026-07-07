@@ -27,6 +27,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/" className="text-gray-300 hover:text-white transition">Home</Link>
             <Link to="/dashboard" className="text-gray-300 hover:text-white transition">Dashboard</Link>
+            <Link to="/net-worth" className="text-gray-300 hover:text-white transition">Net Worth</Link>
             <Link to="/courses" className="text-gray-300 hover:text-white transition">Courses</Link>
             <Link to="/pricing" className="text-gray-300 hover:text-white transition">Pricing</Link>
             {account ? (
@@ -73,6 +74,7 @@ export default function Navbar() {
           <div className="md:hidden pb-4 border-t border-white/10">
             <Link to="/" className="block py-2 text-gray-300 hover:text-white">Home</Link>
             <Link to="/dashboard" className="block py-2 text-gray-300 hover:text-white">Dashboard</Link>
+            <Link to="/net-worth" className="block py-2 text-gray-300 hover:text-white">Net Worth</Link>
             <Link to="/courses" className="block py-2 text-gray-300 hover:text-white">Courses</Link>
             <Link to="/pricing" className="block py-2 text-gray-300 hover:text-white">Pricing</Link>
             <Link to="/admin" className="block py-2 text-gray-300 hover:text-white">Admin</Link>
