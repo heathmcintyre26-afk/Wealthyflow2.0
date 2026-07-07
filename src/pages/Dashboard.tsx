@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { TrendingUp, TrendingDown, DollarSign, Target, Wallet } from 'lucide-react'
 import { useWallet } from '../hooks/useWallet'
+import { WindowWithEthereum } from '../context/wallet'
 
 interface CryptoData {
   id: string
@@ -9,6 +10,21 @@ interface CryptoData {
   price: number
   change24h: number
   marketCap: number
+  quantity: number
+}
+
+interface CoinGeckoMarketData {
+  id: string
+  current_price: number
+  price_change_percentage_24h: number | null
+  market_cap: number
+}
+
+interface PortfolioAsset {
+  id: string
+  marketId: string
+  name: string
+  symbol: string
   quantity: number
 }
 
@@ -21,6 +37,14 @@ interface BalanceLineItem {
 
 const currencyFormat = { minimumFractionDigits: 2, maximumFractionDigits: 2 } as const
 const quantityFormat = { minimumFractionDigits: 0, maximumFractionDigits: 4 } as const
+const marketRefreshIntervalMs = 30000
+
+const portfolioAssets: PortfolioAsset[] = [
+  { id: 'btc', marketId: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', quantity: 0.18 },
+  { id: 'eth', marketId: 'ethereum', name: 'Ethereum', symbol: 'ETH', quantity: 2.4 },
+  { id: 'ada', marketId: 'cardano', name: 'Cardano', symbol: 'ADA', quantity: 3200 },
+  { id: 'sol', marketId: 'solana', name: 'Solana', symbol: 'SOL', quantity: 18 },
+]
 
 const additionalAssets: BalanceLineItem[] = [
   { id: 'cash', label: 'USD Cash Reserve', value: 4200.00, change24h: 0.2 },
@@ -50,21 +74,68 @@ export default function Dashboard() {
   const { account, connect, isConnecting } = useWallet()
   const [cryptos, setCryptos] = useState<CryptoData[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
-  // Sample data - replace with real API calls
-  useEffect(() => {
-    const sampleData: CryptoData[] = [
-      { id: '1', name: 'Bitcoin', symbol: 'BTC', price: 42500, change24h: 2.5, marketCap: 850000000000, quantity: 0.18 },
-      { id: '2', name: 'Ethereum', symbol: 'ETH', price: 2250, change24h: -1.2, marketCap: 270000000000, quantity: 2.4 },
-      { id: '3', name: 'Cardano', symbol: 'ADA', price: 0.75, change24h: 3.8, marketCap: 27000000000, quantity: 3200 },
-      { id: '4', name: 'Solana', symbol: 'SOL', price: 145, change24h: 5.2, marketCap: 62000000000, quantity: 18 },
-    ]
+  const getEthereumBalance = useCallback(async () => {
+    if (!account) return null
+    const ethereum = (window as WindowWithEthereum).ethereum
+    if (!ethereum) return null
 
-    setTimeout(() => {
-      setCryptos(sampleData)
+    try {
+      const balanceHex = await ethereum.request({
+        method: 'eth_getBalance',
+        params: [account, 'latest'],
+      })
+      if (typeof balanceHex !== 'string') return null
+      const wei = BigInt(balanceHex)
+      const whole = Number(wei / 1000000000000000000n)
+      const fraction = Number(wei % 1000000000000000000n) / 1e18
+      return whole + fraction
+    } catch {
+      return null
+    }
+  }, [account])
+
+  const fetchMarketData = useCallback(async () => {
+    try {
+      const ids = portfolioAssets.map((asset) => asset.marketId).join(',')
+      const response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids}&price_change_percentage=24h`)
+      if (!response.ok) throw new Error(`Failed to load market data (${response.status})`)
+      const markets = await response.json() as CoinGeckoMarketData[]
+      const marketById = new Map(markets.map((market) => [market.id, market]))
+      const ethereumBalance = await getEthereumBalance()
+
+      const nextCryptos = portfolioAssets.map((asset) => {
+        const market = marketById.get(asset.marketId)
+        const quantity = asset.symbol === 'ETH' && ethereumBalance !== null ? ethereumBalance : asset.quantity
+        return {
+          id: asset.id,
+          name: asset.name,
+          symbol: asset.symbol,
+          price: market?.current_price ?? 0,
+          change24h: market?.price_change_percentage_24h ?? 0,
+          marketCap: market?.market_cap ?? 0,
+          quantity,
+        }
+      })
+
+      setCryptos(nextCryptos)
+      setLoadError(null)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unable to refresh market data'
+      setLoadError(message)
+    } finally {
       setLoading(false)
-    }, 500)
-  }, [])
+    }
+  }, [getEthereumBalance])
+
+  useEffect(() => {
+    void fetchMarketData()
+    const interval = window.setInterval(() => {
+      void fetchMarketData()
+    }, marketRefreshIntervalMs)
+    return () => window.clearInterval(interval)
+  }, [fetchMarketData])
 
   const { totalAssets, totalLiabilities, netWorth, assetChange, liabilityChange, netWorthChange } = useMemo(() => {
     const holdingsValue = cryptos.reduce((sum, crypto) => sum + (crypto.price * crypto.quantity), 0)
@@ -122,6 +193,11 @@ export default function Dashboard() {
         </div>
 
         {/* Net Worth Stats */}
+        {loadError && (
+          <div className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+            Live market refresh failed: {loadError}. Showing the latest available values.
+          </div>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
           <div className="glass-effect p-6">
             <div className="flex items-center justify-between">
