@@ -9,20 +9,35 @@ interface CryptoData {
   price: number
   change24h: number
   marketCap: number
+  quantity: number
+}
+
+interface BalanceLineItem {
+  id: string
+  label: string
+  value: number
 }
 
 export default function Dashboard() {
   const { account, connect, isConnecting } = useWallet()
   const [cryptos, setCryptos] = useState<CryptoData[]>([])
   const [loading, setLoading] = useState(true)
+  const additionalAssets: BalanceLineItem[] = [
+    { id: 'cash', label: 'USD Cash Reserve', value: 4200.00 },
+    { id: 'staking', label: 'Staking Rewards', value: 980.45 },
+  ]
+  const liabilities: BalanceLineItem[] = [
+    { id: 'margin', label: 'Margin Balance', value: 1850.25 },
+    { id: 'loan', label: 'Hardware Wallet Loan', value: 640.00 },
+  ]
 
   // Sample data - replace with real API calls
   useEffect(() => {
     const sampleData: CryptoData[] = [
-      { id: '1', name: 'Bitcoin', symbol: 'BTC', price: 42500, change24h: 2.5, marketCap: 850000000000 },
-      { id: '2', name: 'Ethereum', symbol: 'ETH', price: 2250, change24h: -1.2, marketCap: 270000000000 },
-      { id: '3', name: 'Cardano', symbol: 'ADA', price: 0.75, change24h: 3.8, marketCap: 27000000000 },
-      { id: '4', name: 'Solana', symbol: 'SOL', price: 145, change24h: 5.2, marketCap: 62000000000 },
+      { id: '1', name: 'Bitcoin', symbol: 'BTC', price: 42500, change24h: 2.5, marketCap: 850000000000, quantity: 0.18 },
+      { id: '2', name: 'Ethereum', symbol: 'ETH', price: 2250, change24h: -1.2, marketCap: 270000000000, quantity: 2.4 },
+      { id: '3', name: 'Cardano', symbol: 'ADA', price: 0.75, change24h: 3.8, marketCap: 27000000000, quantity: 3200 },
+      { id: '4', name: 'Solana', symbol: 'SOL', price: 145, change24h: 5.2, marketCap: 62000000000, quantity: 18 },
     ]
 
     setTimeout(() => {
@@ -31,9 +46,15 @@ export default function Dashboard() {
     }, 500)
   }, [])
 
-  const portfolioValue = 15250.00
-  const portfolioChange = 1250.50
-  const portfolioChangePercent = 8.9
+  const holdingsValue = cryptos.reduce((sum, crypto) => sum + (crypto.price * crypto.quantity), 0)
+  const totalAssets = holdingsValue + additionalAssets.reduce((sum, asset) => sum + asset.value, 0)
+  const totalLiabilities = liabilities.reduce((sum, liability) => sum + liability.value, 0)
+  const netWorth = totalAssets - totalLiabilities
+  const holdingsChangePercent = holdingsValue === 0
+    ? 0
+    : cryptos.reduce((sum, crypto) => sum + ((crypto.price * crypto.quantity) * crypto.change24h), 0) / holdingsValue
+  const netWorthChange = holdingsValue * (holdingsChangePercent / 100)
+  const netWorthChangePercent = netWorth === 0 ? 0 : (netWorthChange / netWorth) * 100
 
   return (
     <div className="min-h-screen bg-crypto-dark">
@@ -60,16 +81,16 @@ export default function Dashboard() {
         {/* Page Title */}
         <div className="mb-12">
           <h1 className="text-4xl font-bold mb-2">Portfolio Dashboard</h1>
-          <p className="text-gray-400">Monitor your crypto investments in real-time</p>
+          <p className="text-gray-400">Track your live net worth across crypto holdings, cash, and liabilities</p>
         </div>
 
-        {/* Portfolio Stats */}
+        {/* Net Worth Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
           <div className="glass-effect p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm mb-2">Portfolio Value</p>
-                <p className="text-3xl font-bold">${portfolioValue.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
+                <p className="text-gray-400 text-sm mb-2">Net Worth</p>
+                <p className="text-3xl font-bold">${netWorth.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
               </div>
               <div className="gradient-crypto p-3 rounded-lg">
                 <DollarSign className="w-6 h-6" />
@@ -80,13 +101,13 @@ export default function Dashboard() {
           <div className="glass-effect p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm mb-2">24h Change</p>
-                <p className={`text-3xl font-bold ${portfolioChange >= 0 ? 'text-crypto-success' : 'text-crypto-danger'}`}>
-                  ${portfolioChange.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                <p className="text-gray-400 text-sm mb-2">Total Assets</p>
+                <p className="text-3xl font-bold text-crypto-success">
+                  ${totalAssets.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </p>
               </div>
-              <div className={`p-3 rounded-lg ${portfolioChange >= 0 ? 'bg-green-500/20' : 'bg-red-500/20'}`}>
-                {portfolioChange >= 0 ? <TrendingUp className="w-6 h-6 text-crypto-success" /> : <TrendingDown className="w-6 h-6 text-crypto-danger" />}
+              <div className="bg-green-500/20 p-3 rounded-lg">
+                <TrendingUp className="w-6 h-6 text-crypto-success" />
               </div>
             </div>
           </div>
@@ -94,9 +115,26 @@ export default function Dashboard() {
           <div className="glass-effect p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm mb-2">Change %</p>
-                <p className={`text-3xl font-bold ${portfolioChangePercent >= 0 ? 'text-crypto-success' : 'text-crypto-danger'}`}>
-                  {portfolioChangePercent >= 0 ? '+' : ''}{portfolioChangePercent}%
+                <p className="text-gray-400 text-sm mb-2">Total Liabilities</p>
+                <p className="text-3xl font-bold text-crypto-danger">
+                  ${totalLiabilities.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+              <div className="bg-red-500/20 p-3 rounded-lg">
+                <TrendingDown className="w-6 h-6 text-crypto-danger" />
+              </div>
+            </div>
+          </div>
+
+          <div className="glass-effect p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-400 text-sm mb-2">24h Net Worth Change</p>
+                <p className={`text-3xl font-bold ${netWorthChange >= 0 ? 'text-crypto-success' : 'text-crypto-danger'}`}>
+                  {netWorthChange >= 0 ? '+' : ''}${Math.abs(netWorthChange).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                </p>
+                <p className={`text-sm mt-2 ${netWorthChangePercent >= 0 ? 'text-crypto-success' : 'text-crypto-danger'}`}>
+                  {netWorthChangePercent >= 0 ? '+' : ''}{netWorthChangePercent.toFixed(2)}%
                 </p>
               </div>
               <div className="bg-blue-500/20 p-3 rounded-lg">
@@ -104,16 +142,45 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="glass-effect p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm mb-2">Assets</p>
-                <p className="text-3xl font-bold">{cryptos.length}</p>
-              </div>
-              <div className="bg-purple-500/20 p-3 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-purple-400" />
-              </div>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-12">
+          <div className="xl:col-span-2 glass-effect overflow-hidden">
+            <div className="px-6 py-4 border-b border-white/10">
+              <h2 className="text-xl font-bold">Asset Breakdown</h2>
+            </div>
+            <div className="divide-y divide-white/10">
+              {[
+                ...cryptos.map((crypto) => ({
+                  id: crypto.id,
+                  label: `${crypto.name} (${crypto.quantity.toLocaleString()} ${crypto.symbol})`,
+                  value: crypto.price * crypto.quantity,
+                })),
+                ...additionalAssets,
+              ].map((asset) => (
+                <div key={asset.id} className="px-6 py-4 flex items-center justify-between">
+                  <p className="text-gray-300">{asset.label}</p>
+                  <p className="font-semibold text-crypto-success">
+                    ${asset.value.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="glass-effect overflow-hidden">
+            <div className="px-6 py-4 border-b border-white/10">
+              <h2 className="text-xl font-bold">Liabilities</h2>
+            </div>
+            <div className="divide-y divide-white/10">
+              {liabilities.map((liability) => (
+                <div key={liability.id} className="px-6 py-4 flex items-center justify-between">
+                  <p className="text-gray-300">{liability.label}</p>
+                  <p className="font-semibold text-crypto-danger">
+                    ${liability.value.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -135,7 +202,9 @@ export default function Dashboard() {
                 <thead className="border-b border-white/10">
                   <tr>
                     <th className="px-6 py-4 text-left text-gray-400 font-semibold">Coin</th>
+                    <th className="px-6 py-4 text-left text-gray-400 font-semibold">Holdings</th>
                     <th className="px-6 py-4 text-left text-gray-400 font-semibold">Price</th>
+                    <th className="px-6 py-4 text-left text-gray-400 font-semibold">Position Value</th>
                     <th className="px-6 py-4 text-left text-gray-400 font-semibold">24h Change</th>
                     <th className="px-6 py-4 text-left text-gray-400 font-semibold">Market Cap</th>
                     <th className="px-6 py-4 text-left text-gray-400 font-semibold">Action</th>
@@ -150,8 +219,14 @@ export default function Dashboard() {
                           <p className="text-gray-400 text-sm">{crypto.symbol}</p>
                         </div>
                       </td>
+                      <td className="px-6 py-4 text-gray-300">
+                        {crypto.quantity.toLocaleString()}
+                      </td>
                       <td className="px-6 py-4 font-semibold">
                         ${crypto.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      </td>
+                      <td className="px-6 py-4 font-semibold text-crypto-success">
+                        ${(crypto.price * crypto.quantity).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-semibold ${
