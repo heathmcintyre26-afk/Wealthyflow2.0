@@ -1,14 +1,26 @@
 import { useState } from 'react'
-import { Menu, X, Wallet } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Menu, X, Wallet, LogOut, User } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useWallet } from '../hooks/useWallet'
+import { useAuth } from '../hooks/useAuth'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const { account, isConnecting, error, connect, disconnect } = useWallet()
+  const { user, signOut } = useAuth()
+  const navigate = useNavigate()
 
   const shortAddress = account
     ? `${account.slice(0, 6)}...${account.slice(-4)}`
+    : null
+
+  const handleSignOut = async () => {
+    await signOut()
+    navigate('/')
+  }
+
+  const shortEmail = user?.email
+    ? user.email.length > 20 ? `${user.email.slice(0, 17)}…` : user.email
     : null
 
   return (
@@ -29,11 +41,13 @@ export default function Navbar() {
             <Link to="/dashboard" className="text-gray-300 hover:text-white transition">Dashboard</Link>
             <Link to="/courses" className="text-gray-300 hover:text-white transition">Courses</Link>
             <Link to="/pricing" className="text-gray-300 hover:text-white transition">Pricing</Link>
+
+            {/* Wallet connect */}
             {account ? (
               <button
                 onClick={disconnect}
                 className="btn-primary text-sm flex items-center space-x-2"
-                title="Click to disconnect"
+                title="Click to disconnect wallet"
               >
                 <span className="w-2 h-2 rounded-full bg-crypto-success inline-block"></span>
                 <span>{shortAddress}</span>
@@ -47,6 +61,29 @@ export default function Navbar() {
                 {isConnecting ? 'Connecting…' : 'Connect Wallet'}
               </button>
             )}
+
+            {/* Auth state */}
+            {user ? (
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-gray-300 flex items-center space-x-1">
+                  <User size={14} />
+                  <span>{shortEmail}</span>
+                </span>
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center space-x-1 text-sm text-gray-400 hover:text-white transition"
+                  title="Sign out"
+                >
+                  <LogOut size={16} />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            ) : (
+              <Link to="/auth" className="text-sm text-crypto-accent hover:text-blue-400 transition font-semibold">
+                Sign In
+              </Link>
+            )}
+
             <Link to="/admin" className="text-gray-300 hover:text-crypto-accent transition text-sm">
               Admin
             </Link>
@@ -76,10 +113,27 @@ export default function Navbar() {
             <Link to="/courses" className="block py-2 text-gray-300 hover:text-white">Courses</Link>
             <Link to="/pricing" className="block py-2 text-gray-300 hover:text-white">Pricing</Link>
             <Link to="/admin" className="block py-2 text-gray-300 hover:text-white">Admin</Link>
+            {user ? (
+              <div className="mt-4 space-y-2">
+                <p className="text-sm text-gray-400 flex items-center space-x-1 py-1">
+                  <User size={14} /><span>{user.email}</span>
+                </p>
+                <button
+                  onClick={handleSignOut}
+                  className="btn-secondary w-full flex items-center justify-center space-x-2 text-sm"
+                >
+                  <LogOut size={16} /><span>Sign Out</span>
+                </button>
+              </div>
+            ) : (
+              <Link to="/auth" className="block mt-4 btn-primary text-center text-sm">
+                Sign In / Sign Up
+              </Link>
+            )}
             {account ? (
               <button
                 onClick={disconnect}
-                className="btn-primary w-full mt-4 text-sm flex items-center justify-center space-x-2"
+                className="btn-primary w-full mt-2 text-sm flex items-center justify-center space-x-2"
               >
                 <span className="w-2 h-2 rounded-full bg-crypto-success inline-block"></span>
                 <span>{shortAddress}</span>
@@ -88,7 +142,7 @@ export default function Navbar() {
               <button
                 onClick={connect}
                 disabled={isConnecting}
-                className="btn-primary w-full mt-4 text-sm disabled:opacity-60"
+                className="btn-primary w-full mt-2 text-sm disabled:opacity-60"
               >
                 {isConnecting ? 'Connecting…' : 'Connect Wallet'}
               </button>

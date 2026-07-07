@@ -1,20 +1,44 @@
-import { useState } from 'react'
-import { Wallet, Lock, LogOut, Copy, Check } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Wallet, Lock, LogOut, Copy, Check, RefreshCw } from 'lucide-react'
+import { useAuth } from '../hooks/useAuth'
+import { fetchTransactions, type Transaction } from '../lib/api'
 
 export default function Admin() {
+  const { user } = useAuth()
   const [adminWallet, setAdminWallet] = useState<string | null>(null)
   const [walletInput, setWalletInput] = useState('')
   const [copied, setCopied] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
 
-  // Simulated wallet data
-  const walletData = {
-    address: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
-    balance: 45.25,
-    revenue: 12450.50,
-    pendingPayouts: 3200.00,
-    totalEarnings: 52650.50,
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [loadingTx, setLoadingTx] = useState(true)
+  const [txError, setTxError] = useState<string | null>(null)
+
+  const loadTransactions = async () => {
+    setLoadingTx(true)
+    setTxError(null)
+    try {
+      const txs = await fetchTransactions()
+      setTransactions(txs)
+    } catch (err) {
+      setTxError(err instanceof Error ? err.message : 'Failed to load transactions')
+    } finally {
+      setLoadingTx(false)
+    }
   }
+
+  useEffect(() => { loadTransactions() }, [])
+
+  // Derived stats from real transactions
+  const totalRevenue = transactions
+    .filter((t) => t.status === 'completed')
+    .reduce((s, t) => s + t.amount, 0)
+  const pendingPayouts = transactions
+    .filter((t) => t.status === 'pending')
+    .reduce((s, t) => s + t.amount, 0)
+  const courseRevenue = transactions
+    .filter((t) => t.status === 'completed' && t.course_id !== null)
+    .reduce((s, t) => s + t.amount, 0)
 
   const handleConnect = () => {
     if (walletInput.toLowerCase().startsWith('0x')) {
@@ -41,9 +65,16 @@ export default function Admin() {
     <div className="min-h-screen bg-crypto-dark">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
-          <p className="text-gray-400">Manage your admin wallet and earnings</p>
+        <div className="mb-12 flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
+            <p className="text-gray-400">
+              Signed in as <span className="text-crypto-accent">{user?.email}</span>
+            </p>
+          </div>
+          <button onClick={loadTransactions} className="flex items-center space-x-2 text-sm text-gray-400 hover:text-white transition">
+            <RefreshCw size={16} /><span>Refresh</span>
+          </button>
         </div>
 
         {/* Warning Alert */}
@@ -77,10 +108,7 @@ export default function Admin() {
                       className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-crypto-accent"
                     />
                   </div>
-                  <button
-                    onClick={handleConnect}
-                    className="w-full btn-primary"
-                  >
+                  <button onClick={handleConnect} className="w-full btn-primary">
                     Connect Wallet
                   </button>
                   <p className="text-xs text-gray-400 text-center">
@@ -98,15 +126,9 @@ export default function Admin() {
                     className="w-full flex items-center justify-center space-x-2 bg-white/10 hover:bg-white/20 rounded-lg px-4 py-2 transition"
                   >
                     {copied ? (
-                      <>
-                        <Check size={18} className="text-crypto-success" />
-                        <span>Copied!</span>
-                      </>
+                      <><Check size={18} className="text-crypto-success" /><span>Copied!</span></>
                     ) : (
-                      <>
-                        <Copy size={18} />
-                        <span>Copy Address</span>
-                      </>
+                      <><Copy size={18} /><span>Copy Address</span></>
                     )}
                   </button>
                   <button
@@ -126,48 +148,68 @@ export default function Admin() {
             {/* Revenue Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="glass-effect p-6">
-                <p className="text-gray-400 text-sm mb-2">Total Earnings</p>
-                <p className="text-3xl font-bold text-crypto-success">${walletData.totalEarnings.toLocaleString()}</p>
+                <p className="text-gray-400 text-sm mb-2">Total Revenue</p>
+                <p className="text-3xl font-bold text-crypto-success">
+                  {loadingTx ? '—' : `$${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+                </p>
               </div>
               <div className="glass-effect p-6">
                 <p className="text-gray-400 text-sm mb-2">Course Revenue</p>
-                <p className="text-3xl font-bold text-crypto-accent">${walletData.revenue.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-crypto-accent">
+                  {loadingTx ? '—' : `$${courseRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+                </p>
               </div>
               <div className="glass-effect p-6">
-                <p className="text-gray-400 text-sm mb-2">Wallet Balance</p>
-                <p className="text-3xl font-bold text-yellow-400">{walletData.balance} ETH</p>
+                <p className="text-gray-400 text-sm mb-2">Total Transactions</p>
+                <p className="text-3xl font-bold text-yellow-400">
+                  {loadingTx ? '—' : transactions.length}
+                </p>
               </div>
               <div className="glass-effect p-6">
                 <p className="text-gray-400 text-sm mb-2">Pending Payouts</p>
-                <p className="text-3xl font-bold text-orange-400">${walletData.pendingPayouts.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-orange-400">
+                  {loadingTx ? '—' : `$${pendingPayouts.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+                </p>
               </div>
             </div>
 
-            {/* Recent Transactions */}
+            {/* Transactions Table */}
             <div className="glass-effect p-8">
               <h3 className="text-xl font-bold mb-6">Recent Transactions</h3>
-              <div className="space-y-4">
-                {[
-                  { date: '2024-06-15', course: 'Technical Analysis', amount: 49, status: 'Completed' },
-                  { date: '2024-06-14', course: 'DeFi & Smart Contracts', amount: 99, status: 'Completed' },
-                  { date: '2024-06-13', course: 'Portfolio Management', amount: 59, status: 'Pending' },
-                ].map((tx, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 border-b border-white/10 last:border-0">
-                    <div>
-                      <p className="font-semibold">{tx.course}</p>
-                      <p className="text-sm text-gray-400">{tx.date}</p>
+              {txError && (
+                <div className="mb-4 p-3 bg-red-500/20 border border-red-500/40 rounded-lg text-sm text-red-400">{txError}</div>
+              )}
+              {loadingTx ? (
+                <div className="text-center py-8">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-crypto-accent"></div>
+                </div>
+              ) : transactions.length === 0 ? (
+                <p className="text-gray-400 text-center py-8">No transactions yet.</p>
+              ) : (
+                <div className="space-y-4">
+                  {transactions.slice(0, 20).map((tx) => (
+                    <div key={tx.id} className="flex items-center justify-between p-4 border-b border-white/10 last:border-0">
+                      <div>
+                        <p className="font-semibold">
+                          {tx.course_id ? `Course #${tx.course_id}` : 'Subscription'}
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          {tx.created_at ? new Date(tx.created_at).toLocaleDateString() : '—'}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold">${tx.amount.toFixed(2)}</p>
+                        <p className={`text-sm ${
+                          tx.status === 'completed' ? 'text-crypto-success' :
+                          tx.status === 'pending' ? 'text-yellow-400' : 'text-crypto-danger'
+                        }`}>
+                          {tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-semibold">${tx.amount}</p>
-                      <p className={`text-sm ${
-                        tx.status === 'Completed' ? 'text-crypto-success' : 'text-yellow-400'
-                      }`}>
-                        {tx.status}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Withdrawal Options */}
@@ -181,7 +223,7 @@ export default function Admin() {
                     <label htmlFor="auto-payout" className="text-gray-300">Enable automatic payouts</label>
                   </div>
                   <button className="w-full btn-primary">
-                    Withdraw ${walletData.pendingPayouts.toLocaleString()} Now
+                    Withdraw ${pendingPayouts.toFixed(2)} Now
                   </button>
                 </div>
               </div>
