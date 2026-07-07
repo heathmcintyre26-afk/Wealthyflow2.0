@@ -1,7 +1,11 @@
 import { useState } from 'react'
-import { Wallet, Lock, LogOut, Copy, Check } from 'lucide-react'
+import { Wallet, Lock, LogOut, Copy, Check, ShieldAlert } from 'lucide-react'
+import { useWallet } from '../hooks/useWallet'
+
+const ADMIN_ADDRESS = (import.meta.env.VITE_ADMIN_ADDRESS as string | undefined)?.toLowerCase()
 
 export default function Admin() {
+  const { account, connect, isConnecting } = useWallet()
   const [adminWallet, setAdminWallet] = useState<string | null>(null)
   const [walletInput, setWalletInput] = useState('')
   const [copied, setCopied] = useState(false)
@@ -35,6 +39,46 @@ export default function Admin() {
     navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  // --- Access guard ---
+  // Require a wallet connection first
+  if (!account) {
+    return (
+      <div className="min-h-screen bg-crypto-dark flex flex-col items-center justify-center space-y-6 px-4 text-center">
+        <div className="gradient-crypto p-5 rounded-2xl">
+          <ShieldAlert className="w-12 h-12" />
+        </div>
+        <h2 className="text-3xl font-bold">Admin Access</h2>
+        <p className="text-gray-400 max-w-md">
+          Connect the authorised admin wallet to access this page.
+        </p>
+        <button
+          onClick={connect}
+          disabled={isConnecting}
+          className="btn-primary text-base disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {isConnecting ? 'Connecting…' : 'Connect Wallet'}
+        </button>
+      </div>
+    )
+  }
+
+  // If VITE_ADMIN_ADDRESS is configured, enforce address match
+  if (ADMIN_ADDRESS && account.toLowerCase() !== ADMIN_ADDRESS) {
+    return (
+      <div className="min-h-screen bg-crypto-dark flex flex-col items-center justify-center space-y-6 px-4 text-center">
+        <div className="bg-red-500/20 p-5 rounded-2xl">
+          <ShieldAlert className="w-12 h-12 text-crypto-danger" />
+        </div>
+        <h2 className="text-3xl font-bold">Access Denied</h2>
+        <p className="text-gray-400 max-w-md">
+          The connected wallet is not authorised to view this page.
+          Please connect the admin wallet to continue.
+        </p>
+        <p className="text-xs text-gray-500 font-mono break-all max-w-xs">{account}</p>
+      </div>
+    )
   }
 
   return (

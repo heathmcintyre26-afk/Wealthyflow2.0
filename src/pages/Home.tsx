@@ -1,4 +1,5 @@
 import { TrendingUp, Shield, Zap, BarChart3, Lock, Smartphone } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 export default function Home() {
   const features = [
@@ -52,12 +53,12 @@ export default function Home() {
             wealthflow.444 combines a secure wallet, live market data, and intelligent trading insights to help you invest smarter in cryptocurrency.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="btn-primary">
+            <Link to="/dashboard" className="btn-primary">
               Get Started
-            </button>
-            <button className="btn-secondary">
+            </Link>
+            <Link to="#features" className="btn-secondary">
               Learn More
-            </button>
+            </Link>
           </div>
 
           {/* Stats */}
@@ -110,9 +111,9 @@ export default function Home() {
           <p className="text-xl text-gray-300 mb-8">
             Join thousands of investors using wealthflow.444 to make smarter trading decisions.
           </p>
-          <button className="btn-primary text-lg">
+          <Link to="/dashboard" className="btn-primary text-lg">
             Launch App
-          </button>
+          </Link>
         </div>
       </section>
     </div>

@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react'
-import { TrendingUp, TrendingDown, DollarSign, Target, Wallet } from 'lucide-react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import { TrendingUp, TrendingDown, DollarSign, Target, Wallet, AlertCircle, RefreshCw } from 'lucide-react'
+import axios from 'axios'
 import { useWallet } from '../hooks/useWallet'
 
 interface CryptoData {
@@ -11,6 +12,30 @@ interface CryptoData {
   marketCap: number
   quantity: number
 }
+
+interface CoinGeckoMarket {
+  id: string
+  symbol: string
+  name: string
+  current_price: number
+  price_change_percentage_24h: number
+  market_cap: number
+}
+
+// User-specific quantities — replace with database values once auth is added
+const HOLDINGS: Record<string, number> = {
+  bitcoin: 0.18,
+  ethereum: 2.4,
+  cardano: 3200,
+  solana: 18,
+}
+
+const COINGECKO_URL =
+  'https://api.coingecko.com/api/v3/coins/markets' +
+  '?vs_currency=usd&ids=bitcoin,ethereum,cardano,solana' +
+  '&order=market_cap_desc&per_page=4&page=1&sparkline=false'
+
+const POLL_INTERVAL_MS = 60_000
 
 interface BalanceLineItem {
   id: string
@@ -50,21 +75,37 @@ export default function Dashboard() {
   const { account, connect, isConnecting } = useWallet()
   const [cryptos, setCryptos] = useState<CryptoData[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
-  // Sample data - replace with real API calls
-  useEffect(() => {
-    const sampleData: CryptoData[] = [
-      { id: '1', name: 'Bitcoin', symbol: 'BTC', price: 42500, change24h: 2.5, marketCap: 850000000000, quantity: 0.18 },
-      { id: '2', name: 'Ethereum', symbol: 'ETH', price: 2250, change24h: -1.2, marketCap: 270000000000, quantity: 2.4 },
-      { id: '3', name: 'Cardano', symbol: 'ADA', price: 0.75, change24h: 3.8, marketCap: 27000000000, quantity: 3200 },
-      { id: '4', name: 'Solana', symbol: 'SOL', price: 145, change24h: 5.2, marketCap: 62000000000, quantity: 18 },
-    ]
-
-    setTimeout(() => {
-      setCryptos(sampleData)
+  const fetchPrices = useCallback(async () => {
+    try {
+      const { data } = await axios.get<CoinGeckoMarket[]>(COINGECKO_URL)
+      setCryptos(
+        data.map((coin) => ({
+          id: coin.id,
+          name: coin.name,
+          symbol: coin.symbol.toUpperCase(),
+          price: coin.current_price,
+          change24h: coin.price_change_percentage_24h ?? 0,
+          marketCap: coin.market_cap,
+          quantity: HOLDINGS[coin.id] ?? 0,
+        })),
+      )
+      setError(null)
+      setLastUpdated(new Date())
+    } catch {
+      setError('Unable to fetch live prices. Retrying shortly…')
+    } finally {
       setLoading(false)
-    }, 500)
+    }
   }, [])
+
+  useEffect(() => {
+    fetchPrices()
+    const id = setInterval(fetchPrices, POLL_INTERVAL_MS)
+    return () => clearInterval(id)
+  }, [fetchPrices])
 
   const { totalAssets, totalLiabilities, netWorth, assetChange, liabilityChange, netWorthChange } = useMemo(() => {
     const holdingsValue = cryptos.reduce((sum, crypto) => sum + (crypto.price * crypto.quantity), 0)
@@ -116,10 +157,26 @@ export default function Dashboard() {
       {account && (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Page Title */}
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold mb-2">Portfolio Dashboard</h1>
-          <p className="text-gray-400">Track your live net worth across crypto holdings, cash, and liabilities</p>
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">Portfolio Dashboard</h1>
+            <p className="text-gray-400">Track your live net worth across crypto holdings, cash, and liabilities</p>
+          </div>
+          {lastUpdated && (
+            <p className="text-gray-500 text-sm flex items-center gap-2">
+              <RefreshCw size={14} />
+              Updated {lastUpdated.toLocaleTimeString()}
+            </p>
+          )}
         </div>
+
+        {/* Error Banner */}
+        {error && (
+          <div className="mb-8 glass-effect p-4 border-l-4 border-crypto-danger flex items-center space-x-3">
+            <AlertCircle size={20} className="text-crypto-danger flex-shrink-0" />
+            <p className="text-gray-300 text-sm">{error}</p>
+          </div>
+        )}
 
         {/* Net Worth Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">

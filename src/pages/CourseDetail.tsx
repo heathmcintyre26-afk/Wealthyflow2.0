@@ -1,63 +1,10 @@
 import { useParams, Link } from 'react-router-dom'
 import { Clock, Users, Star, ArrowLeft } from 'lucide-react'
+import { getCourseById } from '../data/courses'
 
 export default function CourseDetail() {
   const { id } = useParams()
-
-  const courseData: Record<string, {
-    title: string
-    description: string
-    level: string
-    duration: string
-    students: number
-    rating: number
-    price: number
-    tier: string
-    instructor: string
-    image: string
-    content: string[]
-  }> = {
-    '1': {
-      title: 'Crypto Fundamentals',
-      description: 'Learn the basics of blockchain, Bitcoin, and Ethereum',
-      level: 'Beginner',
-      duration: '4 weeks',
-      students: 2500,
-      rating: 4.8,
-      price: 0,
-      tier: 'free',
-      instructor: 'Sarah Chen',
-      image: '🔷',
-      content: [
-        'Introduction to blockchain technology',
-        'Understanding Bitcoin and mining',
-        'Ethereum and smart contracts basics',
-        'Cryptocurrency wallets and security',
-        'Market fundamentals and economics',
-      ],
-    },
-    '2': {
-      title: 'Technical Analysis Mastery',
-      description: 'Master chart patterns, indicators, and trading strategies',
-      level: 'Intermediate',
-      duration: '6 weeks',
-      students: 1800,
-      rating: 4.9,
-      price: 49,
-      tier: 'pro',
-      instructor: 'Mike Thompson',
-      image: '📈',
-      content: [
-        'Candlestick patterns and chart reading',
-        'Moving averages and trend analysis',
-        'Support and resistance levels',
-        'RSI, MACD, and other indicators',
-        'Building a complete trading strategy',
-      ],
-    },
-  }
-
-  const course = courseData[id ?? '1'] ?? courseData['1']
+  const course = getCourseById(id) ?? getCourseById('1')!
 
   return (
     <div className="min-h-screen bg-crypto-dark">
@@ -135,14 +82,13 @@ export default function CourseDetail() {
             <div className="glass-effect p-8">
               <h2 className="text-2xl font-bold mb-6">Course Structure</h2>
               <div className="space-y-4">
-                {[...Array(5)].map((_, i) => (
+                {course.weeks.map((week, i) => (
                   <div key={i} className="border-b border-white/10 pb-4 last:border-0">
-                    <h3 className="font-semibold mb-2">Week {i + 1}: Module Title</h3>
+                    <h3 className="font-semibold mb-2">Week {i + 1}: {week.title}</h3>
                     <ul className="text-sm text-gray-400 space-y-1 ml-4">
-                      <li>• Lesson 1: Introduction</li>
-                      <li>• Lesson 2: Core Concepts</li>
-                      <li>• Lesson 3: Practical Exercise</li>
-                      <li>• Quiz &amp; Assessment</li>
+                      {week.lessons.map((lesson, j) => (
+                        <li key={j}>• {lesson}</li>
+                      ))}
                     </ul>
                   </div>
                 ))}

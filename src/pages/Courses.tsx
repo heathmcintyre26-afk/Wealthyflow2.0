@@ -1,81 +1,8 @@
 import { BookOpen, Star } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { courses } from '../data/courses'
 
 export default function Courses() {
-  const courses = [
-    {
-      id: 1,
-      title: 'Crypto Fundamentals',
-      description: 'Learn the basics of blockchain, Bitcoin, and Ethereum',
-      level: 'Beginner',
-      duration: '4 weeks',
-      students: 2500,
-      rating: 4.8,
-      price: 0,
-      image: '🔷',
-      tier: 'free',
-    },
-    {
-      id: 2,
-      title: 'Technical Analysis Mastery',
-      description: 'Master chart patterns, indicators, and trading strategies',
-      level: 'Intermediate',
-      duration: '6 weeks',
-      students: 1800,
-      rating: 4.9,
-      price: 49,
-      image: '📈',
-      tier: 'pro',
-    },
-    {
-      id: 3,
-      title: 'DeFi & Smart Contracts',
-      description: 'Understand decentralized finance and smart contract development',
-      level: 'Advanced',
-      duration: '8 weeks',
-      students: 950,
-      rating: 4.7,
-      price: 99,
-      image: '⚙️',
-      tier: 'premium',
-    },
-    {
-      id: 4,
-      title: 'Portfolio Management Pro',
-      description: 'Build and manage a professional cryptocurrency portfolio',
-      level: 'Intermediate',
-      duration: '5 weeks',
-      students: 1200,
-      rating: 4.8,
-      price: 59,
-      image: '💼',
-      tier: 'pro',
-    },
-    {
-      id: 5,
-      title: 'Risk Management & Trading Psychology',
-      description: 'Master the mental and strategic aspects of successful trading',
-      level: 'All Levels',
-      duration: '4 weeks',
-      students: 3100,
-      rating: 4.9,
-      price: 39,
-      image: '🧠',
-      tier: 'pro',
-    },
-    {
-      id: 6,
-      title: 'Advanced Trading Algorithms',
-      description: 'Create and deploy automated trading bots and algorithms',
-      level: 'Expert',
-      duration: '10 weeks',
-      students: 450,
-      rating: 4.95,
-      price: 199,
-      image: '🤖',
-      tier: 'premium',
-    },
-  ]
 
   return (
     <div className="min-h-screen bg-crypto-dark">
